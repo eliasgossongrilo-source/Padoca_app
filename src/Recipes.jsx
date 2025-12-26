@@ -669,7 +669,9 @@ export default function Recipes() {
     const [syncing, setSyncing] = useState(false)
     const [syncError, setSyncError] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
+    const [imageToCrop, setImageToCrop] = useState(null) // FIX: Added missing state
     const scrollRef = useRef(null)
+    const fileInputRef = useRef(null) // FIX: Added missing ref
     const pendingChangesRef = useRef({}) // ID -> collected changes
     const saveTimeoutsRef = useRef({}) // ID -> timeout handle
 
@@ -813,7 +815,8 @@ export default function Recipes() {
         }, 1200)
     }
 
-    const handleImageUpload = async (e) => {
+    // --- IMAGE CROPPER FLOW ---
+    const handleImageUpload = (e) => {
         const file = e.target.files[0]
         if (!file) return
 
@@ -822,26 +825,30 @@ export default function Recipes() {
             return
         }
 
-        setIsUploading(true)
+        const reader = new FileReader()
+        reader.onload = () => {
+            setImageToCrop(reader.result)
+        }
+        reader.readAsDataURL(file)
+
+        // Reset input so same file can be selected again
+        e.target.value = null
+    }
+
+    const onCropComplete = async (croppedImage) => {
         try {
-            const r = new FileReader()
-            r.onload = async ev => {
-                try {
-                    const compressed = await compressImage(ev.target.result)
-                    updateRecipe(selectedId, { image: compressed })
-                } catch (err) {
-                    toast.error('Falha ao processar imagem. Tente uma foto menor.')
-                } finally {
-                    setIsUploading(false)
-                }
-            }
-            r.onerror = () => {
-                toast.error('Erro ao ler o arquivo.')
-                setIsUploading(false)
-            }
-            r.readAsDataURL(file)
-        } catch (error) {
-            toast.error('Erro inesperado ao carregar imagem.')
+            setIsUploading(true)
+            setImageToCrop(null) // Close modal
+
+            // Compress the cropped image result
+            const compressed = await compressImage(croppedImage)
+            updateRecipe(selectedId, { image: compressed })
+
+            toast.success('Imagem atualizada!')
+        } catch (err) {
+            console.error(err)
+            toast.error('Erro ao processar imagem.')
+        } finally {
             setIsUploading(false)
         }
     }
