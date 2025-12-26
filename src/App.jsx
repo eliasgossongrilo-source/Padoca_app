@@ -104,6 +104,8 @@ export default function App() {
     if (newView === view) return
     setView(newView)
     localStorage.setItem('padoca_view', newView)
+    // Premium: Smooth scroll to top on navigation (luxury feel)
+    document.getElementById('root')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
