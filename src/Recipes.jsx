@@ -804,11 +804,11 @@ export default function Recipes() {
                             {filtered.map(r => (
                                 <motion.div
                                     layoutId={`card-${r.id}`} key={r.id} onClick={() => setSelectedId(r.id)}
-                                    className="group relative bg-white dark:bg-zinc-950 rounded-[2rem] p-4 border border-zinc-200/50 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20 transition-all cursor-pointer shadow-xl hover:shadow-2xl hover:-translate-y-1 overflow-hidden"
+                                    className="group relative bg-white dark:bg-zinc-950 rounded-[2rem] p-4 border border-zinc-200/50 dark:border-white/10 md:hover:border-zinc-300 md:dark:hover:border-white/20 transition-all cursor-pointer shadow-xl md:hover:shadow-2xl md:hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
                                 >
                                     <div className="relative aspect-[4/5] rounded-[1.5rem] overflow-hidden bg-zinc-100 dark:bg-zinc-900 mb-6 shadow-inner">
                                         {r.image ? (
-                                            <motion.img layoutId={`img-${r.id}`} src={r.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                            <motion.img layoutId={`img-${r.id}`} src={r.image} className="w-full h-full object-cover transition-transform duration-700 md:group-hover:scale-105" />
                                         ) : (
                                             /* Premium List View Placeholder */
                                             <div className="w-full h-full relative overflow-hidden">
@@ -830,7 +830,7 @@ export default function Recipes() {
                                                 </div>
                                             </div>
                                         )}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 md:group-hover:opacity-100 transition-opacity" />
 
                                         {/* Apple-style Delete Button */}
                                         <button
@@ -870,7 +870,7 @@ export default function Recipes() {
                                                 {r.prepTime + r.cookTime}m
                                             </div>
                                         </div>
-                                        <h3 className="text-2xl font-bold leading-tight text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-1">{r.name}</h3>
+                                        <h3 className="text-2xl font-bold leading-tight text-zinc-900 dark:text-white md:group-hover:text-indigo-600 md:dark:group-hover:text-indigo-400 transition-colors mb-1">{r.name}</h3>
                                         <p className="text-xs font-medium text-zinc-400">{(r.ingredientSections || []).reduce((acc, s) => acc + (s.items?.length || 0), 0)} ingredientes</p>
                                     </div>
                                 </motion.div>
