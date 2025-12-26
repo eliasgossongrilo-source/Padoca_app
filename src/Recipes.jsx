@@ -1345,7 +1345,10 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
                             key={item.id} item={item}
                             onUpdate={u => onUpdate({ ...section, items: section.items.map(i => i.id === item.id ? u : i) })}
                             onDelete={() => onUpdate({ ...section, items: section.items.filter(i => i.id !== item.id) })}
-                            onNext={() => onUpdate({ ...section, items: [...section.items, { id: Date.now(), name: '', quantity: '', unit: 'g' }] })}
+                            onNext={() => {
+                                if (!item.name.trim() && !item.quantity.trim()) return
+                                onUpdate({ ...section, items: [...section.items, { id: Date.now(), name: '', quantity: '', unit: 'g' }] })
+                            }}
                             isEditing={isEditing}
                         />
                     ))}
@@ -1414,7 +1417,10 @@ function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditin
                         key={item.id} item={item} index={idx}
                         onUpdate={u => onUpdate({ ...section, items: section.items.map(i => i.id === item.id ? u : i) })}
                         onDelete={() => onUpdate({ ...section, items: section.items.filter(i => i.id !== item.id) })}
-                        onNext={() => onUpdate({ ...section, items: [...section.items, { id: Date.now(), text: '' }] })}
+                        onNext={() => {
+                            if (!item.text.trim()) return
+                            onUpdate({ ...section, items: [...section.items, { id: Date.now(), text: '' }] })
+                        }}
                         isEditing={isEditing}
                     />
                 ))}
