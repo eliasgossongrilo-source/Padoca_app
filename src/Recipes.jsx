@@ -1347,7 +1347,11 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
                             onDelete={() => onUpdate({ ...section, items: section.items.filter(i => i.id !== item.id) })}
                             onNext={() => {
                                 if (!item.name.trim()) return
-                                onUpdate({ ...section, items: [...section.items, { id: Date.now(), name: '', quantity: '', unit: 'g' }] })
+                                const newId = Date.now()
+                                onUpdate({ ...section, items: [...section.items, { id: newId, name: '', quantity: '', unit: 'g' }] })
+                                setTimeout(() => {
+                                    document.getElementById(`ing-name-${newId}`)?.focus()
+                                }, 50)
                             }}
                             isEditing={isEditing}
                         />
@@ -1419,7 +1423,12 @@ function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditin
                         onDelete={() => onUpdate({ ...section, items: section.items.filter(i => i.id !== item.id) })}
                         onNext={() => {
                             if (!item.text.trim()) return
-                            onUpdate({ ...section, items: [...section.items, { id: Date.now(), text: '' }] })
+                            const newId = Date.now()
+                            onUpdate({ ...section, items: [...section.items, { id: newId, text: '' }] })
+                            setTimeout(() => {
+                                const newField = document.querySelector(`textarea[value=""]`)
+                                newField?.focus()
+                            }, 50)
                         }}
                         isEditing={isEditing}
                     />
