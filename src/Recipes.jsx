@@ -1346,7 +1346,7 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
                             onUpdate={u => onUpdate({ ...section, items: section.items.map(i => i.id === item.id ? u : i) })}
                             onDelete={() => onUpdate({ ...section, items: section.items.filter(i => i.id !== item.id) })}
                             onNext={() => {
-                                if (!item.name.trim() && !item.quantity.trim()) return
+                                if (!item.name.trim()) return
                                 onUpdate({ ...section, items: [...section.items, { id: Date.now(), name: '', quantity: '', unit: 'g' }] })
                             }}
                             isEditing={isEditing}
@@ -1360,7 +1360,7 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
                     type="button"
                     onClick={() => {
                         const lastItem = section.items[section.items.length - 1]
-                        if (lastItem && !lastItem.name.trim() && !lastItem.quantity.trim()) return
+                        if (lastItem && !lastItem.name.trim()) return
                         const newItem = { id: Date.now(), name: '', quantity: '', unit: 'g' }
                         onUpdate({ ...section, items: [...section.items, newItem] })
                     }}
