@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { FirebaseService } from './services/firebaseService'
+import { motion, AnimatePresence } from 'framer-motion'
 
 /**
  * Inventory - Premium inventory management with dual quantity tracking
@@ -91,6 +93,15 @@ export default function Inventory() {
     const [searchQuery, setSearchQuery] = useState('')
     const [activeSubcategoryFilter, setActiveSubcategoryFilter] = useState(null)
     const [confirmModal, setConfirmModal] = useState(null)
+
+    // Premium Toast System
+    const [toastMessage, setToastMessage] = useState(null)
+    const toastTimeoutRef = useRef(null)
+    const showToast = useCallback((message, type = 'success') => {
+        if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current)
+        setToastMessage({ message, type })
+        toastTimeoutRef.current = setTimeout(() => setToastMessage(null), 3500)
+    }, [])
 
     // Custom subcategories state (user can add/edit)
     const [subcategories, setSubcategories] = useState(() => {
@@ -302,10 +313,10 @@ export default function Inventory() {
             link.href = url
             link.download = `padoca_estoque_${new Date().toISOString().split('T')[0]}.csv`
             link.click()
-            alert('Relatório de Estoque exportado!')
+            showToast('Relatório de Estoque exportado!', 'success')
         } catch (e) {
             console.error(e)
-            alert('Erro ao exportar CSV')
+            showToast('Erro ao exportar CSV', 'error')
         }
     }
 
@@ -318,9 +329,9 @@ export default function Inventory() {
             a.href = url
             a.download = `padoca_estoque_backup_${new Date().toISOString().split('T')[0]}.json`
             a.click()
-            alert('Backup de Estoque realizado!')
+            showToast('Backup de Estoque realizado!', 'success')
         } catch (e) {
-            alert('Erro ao realizar backup')
+            showToast('Erro ao realizar backup', 'error')
         }
     }
 
@@ -334,12 +345,12 @@ export default function Inventory() {
                 if (parsed.items && Array.isArray(parsed.items)) {
                     setItems(parsed.items)
                     if (parsed.categories) setCategories(parsed.categories)
-                    alert('Dados de Estoque restaurados!')
+                    showToast('Dados de Estoque restaurados!', 'success')
                 } else {
                     throw new Error('Formato inválido')
                 }
             } catch (err) {
-                alert('Arquivo de backup inválido')
+                showToast('Arquivo de backup inválido', 'error')
             }
         }
         reader.readAsText(file)
@@ -1340,6 +1351,28 @@ export default function Inventory() {
                     </div>
                 </div>
             )}
+
+            {/* Premium Toast */}
+            <AnimatePresence>
+                {toastMessage && createPortal(
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                        className={`fixed top-6 left-1/2 -translate-x-1/2 z-[20000] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-xl border ${toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400/20 text-white' :
+                            toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400/20 text-white' :
+                                'bg-zinc-900/90 border-white/10 text-white'
+                            }`}
+                    >
+                        <div className={`w-2 h-2 rounded-full ${toastMessage.type === 'error' ? 'bg-white animate-pulse' :
+                            toastMessage.type === 'success' ? 'bg-white' :
+                                'bg-indigo-400'
+                            }`} />
+                        <span className="text-sm font-semibold tracking-tight">{toastMessage.message}</span>
+                    </motion.div>,
+                    document.body
+                )}
+            </AnimatePresence>
         </div>
     )
 }

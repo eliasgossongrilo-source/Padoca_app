@@ -47,6 +47,15 @@ export default function Production({ inputMode, setInputMode }) {
     const [confirmModal, setConfirmModal] = useState(null)
     const [inputModal, setInputModal] = useState(null)
 
+    // Premium Toast System
+    const [toastMessage, setToastMessage] = useState(null)
+    const toastTimeoutRef = useRef(null)
+    const showToast = (message, type = 'success') => {
+        if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current)
+        setToastMessage({ message, type })
+        toastTimeoutRef.current = setTimeout(() => setToastMessage(null), 3500)
+    }
+
     const [gramsInputs, setGramsInputs] = useState({
         flour: 1736,
         water: 1215,
@@ -286,8 +295,8 @@ export default function Production({ inputMode, setInputMode }) {
                     setRecipes(parsed.recipes)
                     saveAllRecipes(parsed.recipes)
                 }
-                alert('Importação concluída.')
-            } catch (err) { alert('Arquivo inválido.') }
+                showToast('Importação concluída!', 'success')
+            } catch (err) { showToast('Arquivo inválido.', 'error') }
         }
         reader.readAsText(file)
         e.target.value = ''
@@ -868,6 +877,22 @@ export default function Production({ inputMode, setInputMode }) {
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Premium Toast */}
+            {toastMessage && (
+                <div
+                    className={`fixed top-6 left-1/2 -translate-x-1/2 z-[20000] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-xl border animate-fade-in ${toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400/20 text-white' :
+                        toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400/20 text-white' :
+                            'bg-zinc-900/90 border-white/10 text-white'
+                        }`}
+                >
+                    <div className={`w-2 h-2 rounded-full ${toastMessage.type === 'error' ? 'bg-white animate-pulse' :
+                        toastMessage.type === 'success' ? 'bg-white' :
+                            'bg-indigo-400'
+                        }`} />
+                    <span className="text-sm font-semibold tracking-tight">{toastMessage.message}</span>
                 </div>
             )}
         </div>

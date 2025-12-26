@@ -171,7 +171,7 @@ const RecipeCategoryModal = ({ categories, onClose, onUpdate, onRenameCategory }
     }
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4">
             {/* Backdrop */}
             <motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -181,11 +181,11 @@ const RecipeCategoryModal = ({ categories, onClose, onUpdate, onRenameCategory }
 
             {/* Modal Content */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-[2rem] p-6 pb-8 md:p-8 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col"
+                initial={{ opacity: 0, y: 100 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 100 }}
+                transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                className="relative w-full md:max-w-md bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-[2rem] p-6 pb-8 md:p-8 shadow-2xl overflow-hidden max-h-[90vh] md:max-h-[85vh] flex flex-col safe-area-bottom"
             >
                 {/* Header - Inventory Style */}
                 <div className="flex items-center justify-between mb-8 shrink-0">
@@ -195,7 +195,7 @@ const RecipeCategoryModal = ({ categories, onClose, onUpdate, onRenameCategory }
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-3 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors touch-manipulation"
+                        className="p-3 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors touch-manipulation z-[60] relative shrink-0"
                     >
                         <Icons.Close className="w-5 h-5" />
                     </button>
@@ -240,19 +240,35 @@ const RecipeCategoryModal = ({ categories, onClose, onUpdate, onRenameCategory }
                                         style={{ backgroundColor: color }}
                                     />
 
-                                    {/* Color Picker Dropdown */}
-                                    {colorPicker === catId && (
-                                        <div className="absolute left-12 mt-10 z-50 bg-white dark:bg-zinc-800 rounded-2xl shadow-xl p-3 grid grid-cols-6 gap-2 border border-zinc-200 dark:border-zinc-700 animate-slide-up">
-                                            {colorPalette.map(c => (
+                                    {/* Color Picker Dropdown - Mobile Friendly */}
+                                    <AnimatePresence>
+                                        {colorPicker === catId && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.9 }}
+                                                className="fixed inset-x-4 bottom-4 md:absolute md:inset-auto md:left-0 md:top-full md:mt-2 z-[70] bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-4 border border-zinc-200 dark:border-zinc-700"
+                                            >
+                                                <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 text-center md:text-left">Escolha uma cor</div>
+                                                <div className="grid grid-cols-5 gap-3">
+                                                    {colorPalette.map(c => (
+                                                        <button
+                                                            key={c}
+                                                            onClick={() => handleColorChange(cat, c)}
+                                                            className={`w-10 h-10 md:w-7 md:h-7 rounded-full transition-transform hover:scale-110 active:scale-95 ${color === c ? 'ring-2 ring-offset-2 ring-zinc-400 dark:ring-offset-zinc-800' : ''}`}
+                                                            style={{ backgroundColor: c }}
+                                                        />
+                                                    ))}
+                                                </div>
                                                 <button
-                                                    key={c}
-                                                    onClick={() => handleColorChange(cat, c)}
-                                                    className={`w-6 h-6 rounded-full transition-transform hover:scale-110 ${color === c ? 'ring-2 ring-offset-2 ring-zinc-400' : ''}`}
-                                                    style={{ backgroundColor: c }}
-                                                />
-                                            ))}
-                                        </div>
-                                    )}
+                                                    onClick={() => setColorPicker(null)}
+                                                    className="mt-4 w-full py-3 bg-zinc-100 dark:bg-zinc-700 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider md:hidden"
+                                                >
+                                                    Fechar
+                                                </button>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
 
                                     {/* Name */}
                                     <div className="flex-1 min-w-0">
@@ -496,6 +512,7 @@ const InstructionItem = React.memo(({ item, index, onUpdate, onDelete, onNext, i
                 {/* Instruction Text */}
                 {isEditing ? (
                     <textarea
+                        id={`instr-text-${item.id}`}
                         value={item.text}
                         onChange={e => onUpdate({ ...item, text: e.target.value })}
                         onKeyDown={e => {
@@ -765,6 +782,29 @@ export default function Recipes() {
             toast.error('Erro ao excluir receita.')
         }
     }
+
+    // Finish editing: clean up empty rows from all sections before exiting edit mode
+    const finishEditing = useCallback(() => {
+        if (selected && selected.sections) {
+            const cleanedSections = selected.sections.map(section => {
+                if (section.type === 'ingredients') {
+                    return {
+                        ...section,
+                        items: (section.items || []).filter(item => item.name.trim() || item.quantity.trim())
+                    }
+                }
+                if (section.type === 'instructions') {
+                    return {
+                        ...section,
+                        items: (section.items || []).filter(item => item.text.trim())
+                    }
+                }
+                return section
+            })
+            updateRecipe(selectedId, { sections: cleanedSections })
+        }
+        setIsEditing(false)
+    }, [selected, selectedId, updateRecipe])
 
     const filtered = useMemo(() => recipes.filter(r => activeFilter === 'Todas' || r.category === activeFilter), [recipes, activeFilter])
     const selected = useMemo(() => recipes.find(r => String(r.id) === String(selectedId)), [recipes, selectedId])
@@ -1040,7 +1080,7 @@ export default function Recipes() {
 
                                         <div className="flex-1 flex justify-end gap-2">
                                             <button
-                                                onClick={() => setIsEditing(!isEditing)}
+                                                onClick={() => isEditing ? finishEditing() : setIsEditing(true)}
                                                 className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${isEditing
                                                     ? 'bg-indigo-500 text-white border-indigo-500 shadow-indigo-500/30 shadow-lg'
                                                     : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:border-indigo-500 hover:text-indigo-500'}`}
@@ -1308,19 +1348,28 @@ function RecipeSection({ section, onUpdate, onDelete, dragControls, isEditing })
 }
 
 function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing }) {
-    // Ensure there's always an empty row at the end when editing
-    React.useEffect(() => {
-        if (!isEditing) return
-        const items = section.items || []
-        const lastItem = items[items.length - 1]
-        // Add empty row if last row has content
-        if (!lastItem || (lastItem.name.trim() || lastItem.quantity.trim())) {
-            onUpdate({ ...section, items: [...items, { id: Date.now(), name: '', quantity: '', unit: 'g' }] })
-        }
-    }, [section.items, isEditing])
+    const containerRef = React.useRef(null)
+
+    // Add a new ingredient and scroll/focus to it
+    const addNewIngredient = React.useCallback(() => {
+        const newId = `ing-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        const newItem = { id: newId, name: '', quantity: '', unit: 'g' }
+        onUpdate({ ...section, items: [...(section.items || []), newItem] })
+
+        // Use requestAnimationFrame to wait for DOM update
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const field = document.getElementById(`ing-name-${newId}`)
+                if (field) {
+                    field.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    field.focus()
+                }
+            })
+        })
+    }, [section, onUpdate])
 
     return (
-        <div className="relative group/section bg-white dark:bg-black rounded-3xl p-4 md:p-6 border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
+        <div ref={containerRef} className="relative group/section bg-white dark:bg-black rounded-3xl p-4 md:p-6 border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
             <div className="flex items-center justify-between mb-6 pl-1">
                 <div className="flex items-center gap-3 flex-1">
                     <div
@@ -1364,8 +1413,10 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
                             onUpdate={u => onUpdate({ ...section, items: section.items.map(i => i.id === item.id ? u : i) })}
                             onDelete={() => onUpdate({ ...section, items: section.items.filter(i => i.id !== item.id) })}
                             onNext={() => {
-                                if (!item.name.trim()) return
-                                onUpdate({ ...section, items: [...section.items, { id: Date.now(), name: '', quantity: '', unit: 'g' }] })
+                                // Only add new row if current has content
+                                if (item.name.trim()) {
+                                    addNewIngredient()
+                                }
                             }}
                             isEditing={isEditing}
                         />
@@ -1376,17 +1427,7 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
             {isEditing && (
                 <button
                     type="button"
-                    onClick={() => {
-                        // Focus the last (empty) row that already exists
-                        const lastItem = section.items[section.items.length - 1]
-                        if (lastItem) {
-                            const field = document.getElementById(`ing-name-${lastItem.id}`)
-                            if (field) {
-                                field.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                                field.focus()
-                            }
-                        }
-                    }}
+                    onClick={addNewIngredient}
                     className="mt-6 w-full py-4 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-300 transition-all flex items-center justify-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 active:scale-[0.98] touch-manipulation cursor-pointer select-none"
                 >
                     <Icons.Plus /> Adicionar Ingrediente
@@ -1397,16 +1438,23 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
 }
 
 function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditing }) {
-    // Ensure there's always an empty row at the end when editing
-    React.useEffect(() => {
-        if (!isEditing) return
-        const items = section.items || []
-        const lastItem = items[items.length - 1]
-        // Add empty row if last row has content
-        if (!lastItem || lastItem.text.trim()) {
-            onUpdate({ ...section, items: [...items, { id: Date.now(), text: '' }] })
-        }
-    }, [section.items, isEditing])
+    // Add a new instruction and scroll/focus to it
+    const addNewInstruction = React.useCallback(() => {
+        const newId = `instr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        const newItem = { id: newId, text: '' }
+        onUpdate({ ...section, items: [...(section.items || []), newItem] })
+
+        // Use requestAnimationFrame to wait for DOM update
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const field = document.getElementById(`instr-text-${newId}`)
+                if (field) {
+                    field.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    field.focus()
+                }
+            })
+        })
+    }, [section, onUpdate])
 
     return (
         <div className="relative group/section bg-white dark:bg-black rounded-3xl p-4 md:p-6 border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
@@ -1452,8 +1500,10 @@ function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditin
                         onUpdate={u => onUpdate({ ...section, items: section.items.map(i => i.id === item.id ? u : i) })}
                         onDelete={() => onUpdate({ ...section, items: section.items.filter(i => i.id !== item.id) })}
                         onNext={() => {
-                            if (!item.text.trim()) return
-                            onUpdate({ ...section, items: [...section.items, { id: Date.now(), text: '' }] })
+                            // Only add new row if current has content
+                            if (item.text.trim()) {
+                                addNewInstruction()
+                            }
                         }}
                         isEditing={isEditing}
                     />
@@ -1463,15 +1513,7 @@ function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditin
             {isEditing && (
                 <button
                     type="button"
-                    onClick={() => {
-                        // Focus the last (empty) row that already exists
-                        const fields = document.querySelectorAll('textarea')
-                        const lastField = fields[fields.length - 1]
-                        if (lastField) {
-                            lastField.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                            lastField.focus()
-                        }
-                    }}
+                    onClick={addNewInstruction}
                     className="mt-6 w-full py-4 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-300 transition-all flex items-center justify-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 active:scale-[0.98] touch-manipulation cursor-pointer select-none"
                 >
                     <Icons.Plus /> Adicionar Passo
