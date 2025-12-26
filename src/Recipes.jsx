@@ -803,7 +803,7 @@ export default function Recipes() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 px-2">
                             {filtered.map(r => (
                                 <motion.div
-                                    layoutId={`card-${r.id}`} key={r.id} onClick={() => setSelectedId(r.id)}
+                                    layoutId={`card-${r.id}`} key={r.id} onTap={() => setSelectedId(r.id)}
                                     className="group relative bg-white dark:bg-zinc-950 rounded-[2rem] p-4 border border-zinc-200/50 dark:border-white/10 md:hover:border-zinc-300 md:dark:hover:border-white/20 transition-all cursor-pointer shadow-xl md:hover:shadow-2xl md:hover:-translate-y-1 active:scale-[0.98] overflow-hidden"
                                 >
                                     <div className="relative aspect-[4/5] rounded-[1.5rem] overflow-hidden bg-zinc-100 dark:bg-zinc-900 mb-6 shadow-inner">
@@ -823,8 +823,8 @@ export default function Recipes() {
                                                     className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent"
                                                 />
 
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity">
-                                                    <div className="w-12 h-12 rounded-full bg-white/40 dark:bg-white/5 backdrop-blur-md border border-white/20 flex items-center justify-center mb-2 shadow-lg group-hover:scale-110 transition-transform duration-500">
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-40 md:group-hover:opacity-80 transition-opacity">
+                                                    <div className="w-12 h-12 rounded-full bg-white/40 dark:bg-white/5 backdrop-blur-md border border-white/20 flex items-center justify-center mb-2 shadow-lg md:group-hover:scale-110 transition-transform duration-500">
                                                         <Icons.Camera />
                                                     </div>
                                                 </div>
@@ -848,7 +848,7 @@ export default function Recipes() {
                                                     onCancel: () => setConfirmModal(null)
                                                 })
                                             }}
-                                            className="absolute top-3 right-3 p-2.5 rounded-full bg-black/30 hover:bg-rose-500/90 backdrop-blur-md text-white/90 hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-90 hover:scale-100 hover:shadow-lg z-[100] border border-white/10 active:scale-95 touch-manipulation cursor-pointer"
+                                            className="absolute top-3 right-3 p-2.5 rounded-full bg-black/30 hover:bg-rose-500/90 backdrop-blur-md text-white/90 hover:text-white opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform scale-90 hover:scale-100 hover:shadow-lg z-[100] border border-white/10 active:scale-95 touch-manipulation cursor-pointer"
                                         >
                                             <Icons.Trash className="w-4 h-4" />
                                         </button>
