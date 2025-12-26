@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { useScrollLock } from './hooks/useScrollLock'
 import { FirebaseService } from './services/firebaseService'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -498,6 +499,7 @@ export default function Inventory() {
             {/* Add Item Modal - Premium Bottom Sheet */}
             {isAddingItem && (
                 <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+                    <ModalScrollLock />
                     {/* Backdrop */}
                     <div
                         className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
@@ -1137,6 +1139,7 @@ export default function Inventory() {
             {/* Category Management Modal */}
             {isManagingCategories && (
                 <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+                    <ModalScrollLock />
                     {/* Backdrop */}
                     <div
                         className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
@@ -1358,6 +1361,7 @@ export default function Inventory() {
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-[100] flex items-center justify-center p-6"
                     >
+                        <ModalScrollLock />
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -1474,4 +1478,9 @@ export function useInventoryItems() {
     }, [])
 
     return items
+}
+
+function ModalScrollLock() {
+    useScrollLock(true)
+    return null
 }

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { useScrollLock } from './hooks/useScrollLock'
 import BufferedInput from './BufferedInput.jsx'
 import YeastType from './YeastType.jsx'
 import Preferment from './Preferment.jsx'
@@ -810,6 +811,7 @@ export default function Production({ inputMode, setInputMode }) {
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-[100] flex items-center justify-center p-6"
                     >
+                        <ModalScrollLock />
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -865,6 +867,7 @@ export default function Production({ inputMode, setInputMode }) {
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-[100] flex items-center justify-center p-6"
                     >
+                        <ModalScrollLock />
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -936,4 +939,9 @@ export default function Production({ inputMode, setInputMode }) {
             </AnimatePresence>
         </div>
     )
+}
+
+function ModalScrollLock() {
+    useScrollLock(true)
+    return null
 }

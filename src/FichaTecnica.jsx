@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { useScrollLock } from './hooks/useScrollLock'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInventoryItems } from './Inventory.jsx'
 import { FirebaseService } from './services/firebaseService'
@@ -78,6 +79,12 @@ const calculatePricePerBaseUnit = (inventoryItem) => {
     // Convert to price per base unit (g or ml)
     const inventoryUnitToBase = UNIT_TO_BASE[inventoryItem.unit] || 1
     return pricePerInventoryUnit / inventoryUnitToBase // e.g., $0.0006/g
+}
+
+// Helper component to lock scroll when a modal is open
+function ModalScrollLock() {
+    useScrollLock(true)
+    return null
 }
 
 const defaultPizza = {
@@ -410,6 +417,7 @@ export default function FichaTecnica() {
             {/* Create Pizza Modal */}
             {isCreatingPizza && (
                 <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center sm:p-4">
+                    <ModalScrollLock />
                     {/* Backdrop */}
                     <div
                         className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
@@ -640,6 +648,7 @@ export default function FichaTecnica() {
                     {/* Add Ingredient Modal - Apple Premium Design */}
                     {isAddingIngredient && (
                         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+                            <ModalScrollLock />
                             {/* Backdrop */}
                             <div
                                 className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
@@ -1245,6 +1254,7 @@ export default function FichaTecnica() {
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-[100] flex items-center justify-center p-6"
                     >
+                        <ModalScrollLock />
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -1300,6 +1310,7 @@ export default function FichaTecnica() {
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-[100] flex items-center justify-center p-6"
                     >
+                        <ModalScrollLock />
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
