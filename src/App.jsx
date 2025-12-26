@@ -120,7 +120,7 @@ export default function App() {
       </div>
 
       {/* Main Container */}
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 pb-8">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
 
         {/* Premium Header */}
         <header className="sticky top-0 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-4 pb-4 mb-6 md:relative md:pt-8 md:mb-8">
@@ -187,8 +187,8 @@ export default function App() {
                       key={key}
                       onClick={() => handleViewChange(key)}
                       className={`relative flex-1 md:flex-none flex items-center justify-center gap-2 px-4 md:px-5 py-3 text-[10px] md:text-[11px] font-semibold rounded-xl transition-all duration-200 whitespace-nowrap min-w-[60px] ${isActive
-                          ? 'text-zinc-900 dark:text-white'
-                          : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
+                        ? 'text-zinc-900 dark:text-white'
+                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
                         }`}
                     >
                       {/* Active Background */}

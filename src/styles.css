@@ -448,23 +448,36 @@ body {
   @apply border border-transparent;
 }
 
-/* Base Styles */
+/* Base Styles - App Shell Architecture */
 html {
-  /* Prevent layout shift when scrollbar appears/disappears */
+  /* Prevent layout shift */
   scrollbar-gutter: stable;
   height: 100%;
+  width: 100%;
+  overflow: hidden;
+  /* Lock viewport */
+  position: fixed;
+  /* Fix iOS bounce */
 }
 
 body {
   @apply bg-zinc-50 text-zinc-900 antialiased;
   @apply dark:bg-black dark:text-zinc-100;
-  /* Ensure body takes full height */
-  min-height: 100%;
   height: 100%;
+  width: 100%;
+  overflow: hidden;
+  /* Lock body */
+  position: fixed;
+  /* Fix iOS bounce */
 }
 
 #root {
-  min-height: 100%;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  /* Scroll here */
+  -webkit-overflow-scrolling: touch;
+  /* Native momentum */
   display: flex;
   flex-direction: column;
 }

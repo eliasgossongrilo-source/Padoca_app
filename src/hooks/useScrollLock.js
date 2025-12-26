@@ -6,27 +6,28 @@ import { useEffect } from 'react'
  */
 export const useScrollLock = (isLocked) => {
     useEffect(() => {
-        if (!isLocked) return
+        const root = document.getElementById('root')
+        if (!isLocked || !root) return
 
-        // Calculate scrollbar width
-        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+        // Calculate scrollbar width relative to root
+        const scrollbarWidth = root.offsetWidth - root.clientWidth
 
         // Save current styles
-        const originalStyle = window.getComputedStyle(document.body).overflow
-        const originalPaddingRight = window.getComputedStyle(document.body).paddingRight
+        const originalStyle = window.getComputedStyle(root).overflow
+        const originalPaddingRight = window.getComputedStyle(root).paddingRight
 
-        // Lock body and add padding to prevent shift
-        document.body.style.overflow = 'hidden'
+        // Lock root and add padding to prevent shift
+        root.style.overflow = 'hidden'
 
         // Only add padding if there was a scrollbar
         if (scrollbarWidth > 0) {
-            document.body.style.paddingRight = `${parseInt(originalPaddingRight || 0) + scrollbarWidth}px`
+            root.style.paddingRight = `${parseInt(originalPaddingRight || 0) + scrollbarWidth}px`
         }
 
         return () => {
             // Restore original styles
-            document.body.style.overflow = originalStyle
-            document.body.style.paddingRight = originalPaddingRight
+            root.style.overflow = originalStyle
+            root.style.paddingRight = originalPaddingRight
         }
     }, [isLocked])
 }
