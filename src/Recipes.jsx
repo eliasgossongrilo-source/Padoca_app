@@ -783,6 +783,9 @@ export default function Recipes() {
         }
     }
 
+    const filtered = useMemo(() => recipes.filter(r => activeFilter === 'Todas' || r.category === activeFilter), [recipes, activeFilter])
+    const selected = useMemo(() => recipes.find(r => String(r.id) === String(selectedId)), [recipes, selectedId])
+
     // Finish editing: clean up empty rows from all sections before exiting edit mode
     const finishEditing = useCallback(() => {
         if (selected && selected.sections) {
@@ -805,9 +808,6 @@ export default function Recipes() {
         }
         setIsEditing(false)
     }, [selected, selectedId, updateRecipe])
-
-    const filtered = useMemo(() => recipes.filter(r => activeFilter === 'Todas' || r.category === activeFilter), [recipes, activeFilter])
-    const selected = useMemo(() => recipes.find(r => String(r.id) === String(selectedId)), [recipes, selectedId])
 
     if (loading) return (
         <div className="h-screen flex items-center justify-center bg-zinc-50 dark:bg-black">
