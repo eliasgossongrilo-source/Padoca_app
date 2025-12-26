@@ -713,7 +713,7 @@ export default function Recipes() {
     )
 
     return (
-        <div className="space-y-6 md:space-y-8 animate-fade-in pb-16 relative font-sans selection:bg-indigo-500/20">
+        <div className="space-y-6 md:space-y-8 animate-fade-in pb-16 relative font-sans selection:bg-indigo-500/20 overflow-x-hidden">
             {/* Ultra-Subtle Background */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden select-none opacity-40">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/5 blur-[120px] rounded-full"></div>
@@ -776,7 +776,7 @@ export default function Recipes() {
                         </div>
 
                         {/* Filters */}
-                        <div className="sticky top-4 z-30 mb-8 py-4 -mx-6 px-6 overflow-x-auto scrollbar-hidden bg-zinc-50/80 dark:bg-black/80 backdrop-blur-xl supports-[backdrop-filter]:bg-zinc-50/50">
+                        <div className="sticky top-4 z-30 mb-8 py-4 -mx-4 px-4 md:-mx-6 md:px-6 overflow-x-auto scrollbar-hidden bg-zinc-50/80 dark:bg-black/80 backdrop-blur-xl supports-[backdrop-filter]:bg-zinc-50/50">
                             <div className="flex items-center gap-2 w-max">
                                 {['Todas', ...categories].map(cat => (
                                     <button
