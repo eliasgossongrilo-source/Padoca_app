@@ -80,11 +80,12 @@ const spring = {
   mass: 0.8
 }
 
-// Page transition variants - Optimized for instant feel
+// Page transition variants - Ultra-fast Apple-style (iOS tab switching)
+// No scale or y transforms - just instant opacity fade
 const pageVariants = {
-  initial: { opacity: 0, y: 12, scale: 0.98 },
-  enter: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: -8, scale: 0.98 }
+  initial: { opacity: 0 },
+  enter: { opacity: 1 },
+  exit: { opacity: 0 }
 }
 
 export default function App() {
@@ -239,7 +240,7 @@ export default function App() {
             animate="enter"
             exit="exit"
             variants={pageVariants}
-            transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.05, ease: "easeOut" }}
             className="relative z-10"
           >
             {view === 'kanban' ? (
@@ -257,6 +258,28 @@ export default function App() {
             )}
           </motion.main>
         </AnimatePresence>
+
+        {/* Fixed Management FAB - Apple-style */}
+        {(view === 'inventory' || view === 'costs') && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-2xl shadow-2xl flex items-center justify-center active:scale-95 transition-all hover:shadow-xl"
+            style={{
+              bottom: 'max(24px, calc(env(safe-area-inset-bottom) + 16px))',
+              right: 'max(24px, env(safe-area-inset-right))'
+            }}
+            onClick={() => {
+              // Dispatch custom event to open management modal
+              window.dispatchEvent(new CustomEvent('open-management-modal'))
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </motion.button>
+        )}
       </div>
     </div>
   )

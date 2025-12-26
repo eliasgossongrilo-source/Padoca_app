@@ -415,62 +415,78 @@ export default function FichaTecnica() {
             </div>
 
             {/* Create Pizza Modal */}
-            {isCreatingPizza && (
-                <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center sm:p-4">
-                    <ModalScrollLock />
-                    {/* Backdrop */}
-                    <div
-                        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
-                        onClick={() => setIsCreatingPizza(false)}
-                    ></div>
+            <AnimatePresence>
+                {isCreatingPizza && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-end md:items-center justify-center sm:p-4"
+                    >
+                        <ModalScrollLock />
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+                            onClick={() => setIsCreatingPizza(false)}
+                        />
 
-                    {/* Modal Content */}
-                    <div className="relative w-full md:max-w-md bg-white dark:bg-zinc-900 rounded-t-[2.5rem] md:rounded-[2.5rem] p-8 pb-12 md:pb-8 shadow-2xl animate-slide-up ring-1 ring-zinc-900/5 dark:ring-white/10">
-                        {/* Drag Handle (Mobile only) */}
-                        <div className="md:hidden w-full flex justify-center mb-8">
-                            <div className="w-12 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
-                        </div>
-
-                        <div className="text-center mb-8">
-                            <h3 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight mb-2">Nova Pizza</h3>
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400">Dê um nome para sua nova receita</p>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div className="relative group">
-                                <input
-                                    type="text"
-                                    className="w-full px-5 py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800/50 border-2 border-transparent focus:border-zinc-900 dark:focus:border-white text-zinc-900 dark:text-white text-lg font-medium text-center focus:outline-none transition-all placeholder:text-zinc-400"
-                                    placeholder="Ex: Margherita"
-                                    value={newPizzaName}
-                                    onChange={(e) => setNewPizzaName(e.target.value)}
-                                    autoFocus
-                                    onKeyDown={(e) => e.key === 'Enter' && handleCreatePizza()}
-                                />
+                        {/* Modal Content */}
+                        <motion.div
+                            initial={{ y: "100%", opacity: 0.5 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: "100%", opacity: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="relative w-full md:max-w-md bg-white dark:bg-zinc-900 rounded-t-[2.5rem] md:rounded-[2.5rem] p-8 pb-12 md:pb-8 shadow-2xl ring-1 ring-zinc-900/5 dark:ring-white/10"
+                        >
+                            {/* Drag Handle (Mobile only) */}
+                            <div className="md:hidden w-full flex justify-center mb-8">
+                                <div className="w-12 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
                             </div>
 
-                            <div className="flex gap-3 pt-4 safe-area-bottom">
-                                <button
-                                    onClick={() => {
-                                        setIsCreatingPizza(false)
-                                        setNewPizzaName('')
-                                    }}
-                                    className="flex-1 px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-[0.98]"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    onClick={handleCreatePizza}
-                                    disabled={!newPizzaName.trim()}
-                                    className="flex-[2] px-6 py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold text-xs uppercase tracking-wider hover:bg-zinc-800 dark:hover:bg-zinc-100 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none shadow-xl shadow-zinc-900/10"
-                                >
-                                    Criar
-                                </button>
+                            <div className="text-center mb-8">
+                                <h3 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight mb-2">Nova Pizza</h3>
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400">Dê um nome para sua nova receita</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+
+                            <div className="space-y-6">
+                                <div className="relative group">
+                                    <input
+                                        type="text"
+                                        className="w-full px-5 py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800/50 border-2 border-transparent focus:border-zinc-900 dark:focus:border-white text-zinc-900 dark:text-white text-lg font-medium text-center focus:outline-none transition-all placeholder:text-zinc-400"
+                                        placeholder="Ex: Margherita"
+                                        value={newPizzaName}
+                                        onChange={(e) => setNewPizzaName(e.target.value)}
+                                        autoFocus
+                                        onKeyDown={(e) => e.key === 'Enter' && handleCreatePizza()}
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 pt-4 safe-area-bottom">
+                                    <button
+                                        onClick={() => {
+                                            setIsCreatingPizza(false)
+                                            setNewPizzaName('')
+                                        }}
+                                        className="flex-1 px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-[0.98]"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleCreatePizza}
+                                        disabled={!newPizzaName.trim()}
+                                        className="flex-[2] px-6 py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold text-xs uppercase tracking-wider hover:bg-zinc-800 dark:hover:bg-zinc-100 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none shadow-xl shadow-zinc-900/10"
+                                    >
+                                        Criar
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Pizza Grid - Premium Cards */}
             {!selectedPizzaId && (
@@ -646,272 +662,288 @@ export default function FichaTecnica() {
                     )}
 
                     {/* Add Ingredient Modal - Apple Premium Design */}
-                    {isAddingIngredient && (
-                        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-                            <ModalScrollLock />
-                            {/* Backdrop */}
-                            <div
-                                className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
-                                onClick={() => {
-                                    setIsAddingIngredient(false)
-                                    setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '', isSyncedFromInventory: false, inventoryItemId: null })
-                                    setMatchedInventoryItem(null)
-                                }}
-                            ></div>
+                    <AnimatePresence>
+                        {isAddingIngredient && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4"
+                            >
+                                <ModalScrollLock />
+                                {/* Backdrop */}
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+                                    onClick={() => {
+                                        setIsAddingIngredient(false)
+                                        setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '', isSyncedFromInventory: false, inventoryItemId: null })
+                                        setMatchedInventoryItem(null)
+                                    }}
+                                />
 
-                            {/* Modal Content */}
-                            <div className="relative w-full md:max-w-lg bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-[2rem] p-6 pb-32 md:p-8 shadow-2xl animate-slide-up max-h-[85vh] overflow-y-auto custom-scrollbar">
+                                {/* Modal Content */}
+                                <motion.div
+                                    initial={{ y: "100%", opacity: 0.5 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    exit={{ y: "100%", opacity: 0 }}
+                                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                    className="relative w-full md:max-w-lg bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-[2rem] p-6 pb-32 md:p-8 shadow-2xl max-h-[85dvh] overflow-y-auto custom-scrollbar"
+                                >
 
-                                {/* Drag Handle (Mobile only) */}
-                                <div className="md:hidden w-full flex justify-center mb-5">
-                                    <div className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
-                                </div>
+                                    {/* Drag Handle (Mobile only) */}
+                                    <div className="md:hidden w-full flex justify-center mb-5">
+                                        <div className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+                                    </div>
 
-                                {/* Header */}
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Novo Ingrediente</h3>
-                                    <button
-                                        onClick={() => {
-                                            setIsAddingIngredient(false)
-                                            setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '', isSyncedFromInventory: false, inventoryItemId: null })
-                                            setMatchedInventoryItem(null)
-                                        }}
-                                        className="p-2 -mr-2 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                {/* Search Input */}
-                                <div className="relative mb-5">
-                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
-                                        Nome do Ingrediente
-                                    </label>
-                                    <div className="relative">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Novo Ingrediente</h3>
+                                        <button
+                                            onClick={() => {
+                                                setIsAddingIngredient(false)
+                                                setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '', isSyncedFromInventory: false, inventoryItemId: null })
+                                                setMatchedInventoryItem(null)
+                                            }}
+                                            className="p-2 -mr-2 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                                             </svg>
-                                        </div>
-                                        <input
-                                            id="cat-ing-name-input"
-                                            type="text"
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault()
-                                                    document.getElementById('cat-ing-qty-input')?.focus()
-                                                }
-                                            }}
-                                            className={`w-full pl-12 pr-4 py-4 rounded-2xl text-base font-semibold transition-all ${matchedInventoryItem
-                                                ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-500/30 text-emerald-900 dark:text-emerald-100 shadow-[0_0_20px_rgba(16,185,129,0.1)]'
-                                                : 'bg-zinc-50/50 dark:bg-black/20 border border-zinc-200/50 dark:border-white/5 text-zinc-900 dark:text-white shadow-inner focus:shadow-lg focus:bg-white dark:focus:bg-black/40'
-                                                } focus:outline-none focus:ring-1 focus:ring-zinc-900/10 dark:focus:ring-white/10 placeholder:text-zinc-400`}
-                                            placeholder="Buscar no estoque..."
-                                            value={newIngredient.name}
-                                            onChange={(e) => {
-                                                const val = e.target.value
-                                                setNewIngredient(prev => ({ ...prev, name: val }))
-                                                if (matchedInventoryItem && val !== matchedInventoryItem.name) {
-                                                    setMatchedInventoryItem(null)
-                                                    setNewIngredient(prev => ({ ...prev, pricePerUnit: '', isSyncedFromInventory: false, inventoryItemId: null }))
-                                                }
-                                                handleIngredientNameChange(val)
-                                            }}
-                                            autoFocus
-                                        />
-                                        {matchedInventoryItem && (
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </button>
+                                    </div>
+
+                                    {/* Search Input */}
+                                    <div className="relative mb-5">
+                                        <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+                                            Nome do Ingrediente
+                                        </label>
+                                        <div className="relative">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                                 </svg>
+                                            </div>
+                                            <input
+                                                id="cat-ing-name-input"
+                                                type="text"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault()
+                                                        document.getElementById('cat-ing-qty-input')?.focus()
+                                                    }
+                                                }}
+                                                className={`w-full pl-12 pr-4 py-4 rounded-2xl text-base font-semibold transition-all ${matchedInventoryItem
+                                                    ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-500/30 text-emerald-900 dark:text-emerald-100 shadow-[0_0_20px_rgba(16,185,129,0.1)]'
+                                                    : 'bg-zinc-50/50 dark:bg-black/20 border border-zinc-200/50 dark:border-white/5 text-zinc-900 dark:text-white shadow-inner focus:shadow-lg focus:bg-white dark:focus:bg-black/40'
+                                                    } focus:outline-none focus:ring-1 focus:ring-zinc-900/10 dark:focus:ring-white/10 placeholder:text-zinc-400`}
+                                                placeholder="Buscar no estoque..."
+                                                value={newIngredient.name}
+                                                onChange={(e) => {
+                                                    const val = e.target.value
+                                                    setNewIngredient(prev => ({ ...prev, name: val }))
+                                                    if (matchedInventoryItem && val !== matchedInventoryItem.name) {
+                                                        setMatchedInventoryItem(null)
+                                                        setNewIngredient(prev => ({ ...prev, pricePerUnit: '', isSyncedFromInventory: false, inventoryItemId: null }))
+                                                    }
+                                                    handleIngredientNameChange(val)
+                                                }}
+                                                autoFocus
+                                            />
+                                            {matchedInventoryItem && (
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Autocomplete Dropdown - Premium Style (Inline/Relative for perfect mobile scrolling) */}
+                                        {newIngredient.name.length > 0 && !matchedInventoryItem && (
+                                            <div className="mt-2 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden max-h-[50vh] overflow-y-auto custom-scrollbar animate-fade-in pb-2">
+                                                {(() => {
+                                                    const matches = inventoryItems.filter(i =>
+                                                        i.name.toLowerCase().includes(newIngredient.name.toLowerCase())
+                                                    ).slice(0, 6)
+
+                                                    if (matches.length === 0 && newIngredient.name.length > 1) {
+                                                        return (
+                                                            <div className="p-5 text-center">
+                                                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 mb-3">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                </div>
+                                                                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Nenhum item encontrado</p>
+                                                                <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">Adicione "{newIngredient.name}" ao Estoque primeiro</p>
+                                                            </div>
+                                                        )
+                                                    }
+
+                                                    return matches.map((item, idx) => (
+                                                        <button
+                                                            key={item.id}
+                                                            onClick={() => {
+                                                                setMatchedInventoryItem(item)
+                                                                const pricePerBaseUnit = calculatePricePerBaseUnit(item)
+                                                                const targetUnitToBase = UNIT_TO_BASE[newIngredient.unit] || 1
+                                                                const pricePerTargetUnit = pricePerBaseUnit * targetUnitToBase
+                                                                setNewIngredient(prev => ({
+                                                                    ...prev,
+                                                                    name: item.name,
+                                                                    pricePerUnit: pricePerTargetUnit.toFixed(6),
+                                                                    isSyncedFromInventory: true,
+                                                                    inventoryItemId: item.id
+                                                                }))
+                                                            }}
+                                                            className={`w-full text-left px-5 py-4 flex items-center justify-between hover:bg-zinc-100 dark:hover:bg-zinc-700/50 transition-colors group ${idx !== matches.length - 1 ? 'border-b border-zinc-200/50 dark:border-zinc-700/50' : ''}`}
+                                                        >
+                                                            <div>
+                                                                <span className="font-semibold text-zinc-900 dark:text-white">{item.name}</span>
+                                                                <span className="text-xs text-zinc-400 dark:text-zinc-500 ml-2">
+                                                                    {item.packageQuantity * item.packageCount} {item.unit}
+                                                                </span>
+                                                            </div>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-zinc-300 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                            </svg>
+                                                        </button>
+                                                    ))
+                                                })()}
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* Autocomplete Dropdown - Premium Style (Inline/Relative for perfect mobile scrolling) */}
-                                    {newIngredient.name.length > 0 && !matchedInventoryItem && (
-                                        <div className="mt-2 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden max-h-[50vh] overflow-y-auto custom-scrollbar animate-fade-in pb-2">
-                                            {(() => {
-                                                const matches = inventoryItems.filter(i =>
-                                                    i.name.toLowerCase().includes(newIngredient.name.toLowerCase())
-                                                ).slice(0, 6)
-
-                                                if (matches.length === 0 && newIngredient.name.length > 1) {
-                                                    return (
-                                                        <div className="p-5 text-center">
-                                                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 mb-3">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                </svg>
-                                                            </div>
-                                                            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Nenhum item encontrado</p>
-                                                            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">Adicione "{newIngredient.name}" ao Estoque primeiro</p>
-                                                        </div>
-                                                    )
-                                                }
-
-                                                return matches.map((item, idx) => (
-                                                    <button
-                                                        key={item.id}
-                                                        onClick={() => {
-                                                            setMatchedInventoryItem(item)
-                                                            const pricePerBaseUnit = calculatePricePerBaseUnit(item)
-                                                            const targetUnitToBase = UNIT_TO_BASE[newIngredient.unit] || 1
-                                                            const pricePerTargetUnit = pricePerBaseUnit * targetUnitToBase
-                                                            setNewIngredient(prev => ({
-                                                                ...prev,
-                                                                name: item.name,
-                                                                pricePerUnit: pricePerTargetUnit.toFixed(6),
-                                                                isSyncedFromInventory: true,
-                                                                inventoryItemId: item.id
-                                                            }))
-                                                        }}
-                                                        className={`w-full text-left px-5 py-4 flex items-center justify-between hover:bg-zinc-100 dark:hover:bg-zinc-700/50 transition-colors group ${idx !== matches.length - 1 ? 'border-b border-zinc-200/50 dark:border-zinc-700/50' : ''}`}
-                                                    >
-                                                        <div>
-                                                            <span className="font-semibold text-zinc-900 dark:text-white">{item.name}</span>
-                                                            <span className="text-xs text-zinc-400 dark:text-zinc-500 ml-2">
-                                                                {item.packageQuantity * item.packageCount} {item.unit}
-                                                            </span>
-                                                        </div>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-zinc-300 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                                        </svg>
-                                                    </button>
-                                                ))
-                                            })()}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Synced Indicator */}
-                                {matchedInventoryItem && (
-                                    <div className="mb-5 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50">
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                                </svg>
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-bold text-emerald-800 dark:text-emerald-300 truncate">{matchedInventoryItem.name}</p>
-                                                <p className="text-xs text-emerald-600 dark:text-emerald-400">
-                                                    Estoque: {matchedInventoryItem.packageQuantity * matchedInventoryItem.packageCount} {matchedInventoryItem.unit} • {formatCurrency(matchedInventoryItem.packageCount * matchedInventoryItem.pricePerUnit)}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Manual Entry Fields (Name and Price if not matched, or for edit) */}
-                                {!matchedInventoryItem && (
-                                    <div className="space-y-4 mb-5">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Preço por Unidade</label>
-                                                <div className="relative">
-                                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm font-bold">R$</span>
-                                                    <input
-                                                        type="number"
-                                                        step="any"
-                                                        inputMode="decimal"
-                                                        className="w-full pl-10 pr-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right text-lg font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
-                                                        placeholder="0,00"
-                                                        value={newIngredient.pricePerUnit}
-                                                        onChange={(e) => setNewIngredient(prev => ({ ...prev, pricePerUnit: e.target.value }))}
-                                                    />
+                                    {/* Synced Indicator */}
+                                    {matchedInventoryItem && (
+                                        <div className="mb-5 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50">
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-bold text-emerald-800 dark:text-emerald-300 truncate">{matchedInventoryItem.name}</p>
+                                                    <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                                                        Estoque: {matchedInventoryItem.packageQuantity * matchedInventoryItem.packageCount} {matchedInventoryItem.unit} • {formatCurrency(matchedInventoryItem.packageCount * matchedInventoryItem.pricePerUnit)}
+                                                    </p>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Unidade</label>
-                                                <select
-                                                    className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-lg font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all appearance-none text-center"
-                                                    value={newIngredient.unit}
-                                                    onChange={(e) => handleUnitChange(e.target.value)}
-                                                >
-                                                    <option value="g">g</option>
-                                                    <option value="kg">kg</option>
-                                                    <option value="ml">ml</option>
-                                                    <option value="L">L</option>
-                                                    <option value="un">un</option>
-                                                </select>
-                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Quantity & Unit Row */}
-                                <div className="grid grid-cols-2 gap-4 mb-5">
-                                    <div>
-                                        <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Quantidade</label>
-                                        <input
-                                            id="cat-ing-qty-input"
-                                            type="number"
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault()
-                                                    // Add ingredient and keep form open for next one
-                                                    handleAddIngredient(true)
-                                                }
-                                            }}
-                                            step="any"
-                                            inputMode="decimal"
-                                            className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right text-lg font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all"
-                                            placeholder="0"
-                                            value={newIngredient.quantity}
-                                            onChange={(e) => setNewIngredient(prev => ({ ...prev, quantity: e.target.value }))}
-                                        />
-                                    </div>
-                                    {matchedInventoryItem && (
-                                        <div>
-                                            <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Unidade</label>
-                                            <div className="w-full px-4 py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 text-lg font-semibold text-center">
-                                                {newIngredient.unit}
+                                    {/* Manual Entry Fields (Name and Price if not matched, or for edit) */}
+                                    {!matchedInventoryItem && (
+                                        <div className="space-y-4 mb-5">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Preço por Unidade</label>
+                                                    <div className="relative">
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm font-bold">R$</span>
+                                                        <input
+                                                            type="number"
+                                                            step="any"
+                                                            inputMode="decimal"
+                                                            className="w-full pl-10 pr-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right text-lg font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
+                                                            placeholder="0,00"
+                                                            value={newIngredient.pricePerUnit}
+                                                            onChange={(e) => setNewIngredient(prev => ({ ...prev, pricePerUnit: e.target.value }))}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Unidade</label>
+                                                    <select
+                                                        className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-lg font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all appearance-none text-center"
+                                                        value={newIngredient.unit}
+                                                        onChange={(e) => handleUnitChange(e.target.value)}
+                                                    >
+                                                        <option value="g">g</option>
+                                                        <option value="kg">kg</option>
+                                                        <option value="ml">ml</option>
+                                                        <option value="L">L</option>
+                                                        <option value="un">un</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
-                                </div>
 
-                                {/* Cost Preview */}
-                                {matchedInventoryItem && newIngredient.quantity && (
-                                    <div className="mb-6 p-5 rounded-2xl bg-zinc-900 dark:bg-white">
-                                        <div className="text-[10px] font-bold text-white/50 dark:text-zinc-900/50 uppercase tracking-widest mb-2">Custo Calculado</div>
-                                        <div className="flex items-end justify-between">
-                                            <div className="text-sm text-white/70 dark:text-zinc-600">
-                                                {newIngredient.quantity} {newIngredient.unit} × {formatPrice(newIngredient.pricePerUnit)}/{newIngredient.unit}
+                                    {/* Quantity & Unit Row */}
+                                    <div className="grid grid-cols-2 gap-4 mb-5">
+                                        <div>
+                                            <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Quantidade</label>
+                                            <input
+                                                id="cat-ing-qty-input"
+                                                type="number"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault()
+                                                        // Add ingredient and keep form open for next one
+                                                        handleAddIngredient(true)
+                                                    }
+                                                }}
+                                                step="any"
+                                                inputMode="decimal"
+                                                className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right text-lg font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                                                placeholder="0"
+                                                value={newIngredient.quantity}
+                                                onChange={(e) => setNewIngredient(prev => ({ ...prev, quantity: e.target.value }))}
+                                            />
+                                        </div>
+                                        {matchedInventoryItem && (
+                                            <div>
+                                                <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Unidade</label>
+                                                <div className="w-full px-4 py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 text-lg font-semibold text-center">
+                                                    {newIngredient.unit}
+                                                </div>
                                             </div>
-                                            <div className="text-3xl font-bold text-white dark:text-zinc-900 tabular-nums">
-                                                {formatCurrency(Number(newIngredient.quantity) * Number(newIngredient.pricePerUnit))}
+                                        )}
+                                    </div>
+
+                                    {/* Cost Preview */}
+                                    {matchedInventoryItem && newIngredient.quantity && (
+                                        <div className="mb-6 p-5 rounded-2xl bg-zinc-900 dark:bg-white">
+                                            <div className="text-[10px] font-bold text-white/50 dark:text-zinc-900/50 uppercase tracking-widest mb-2">Custo Calculado</div>
+                                            <div className="flex items-end justify-between">
+                                                <div className="text-sm text-white/70 dark:text-zinc-600">
+                                                    {newIngredient.quantity} {newIngredient.unit} × {formatPrice(newIngredient.pricePerUnit)}/{newIngredient.unit}
+                                                </div>
+                                                <div className="text-3xl font-bold text-white dark:text-zinc-900 tabular-nums">
+                                                    {formatCurrency(Number(newIngredient.quantity) * Number(newIngredient.pricePerUnit))}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Action Buttons */}
-                                <div className="flex gap-3 safe-area-bottom">
-                                    <button
-                                        onClick={() => {
-                                            setIsAddingIngredient(false)
-                                            setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '', isSyncedFromInventory: false, inventoryItemId: null })
-                                            setMatchedInventoryItem(null)
-                                        }}
-                                        className="flex-1 px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-[0.98]"
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button
-                                        onClick={handleAddIngredient}
-                                        disabled={!newIngredient.name || !newIngredient.quantity}
-                                        className="flex-[2] px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-white bg-zinc-900 dark:bg-white dark:text-zinc-900 shadow-lg shadow-zinc-900/20 hover:shadow-xl active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
-                                    >
-                                        Adicionar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                                    {/* Action Buttons */}
+                                    <div className="flex gap-3 safe-area-bottom">
+                                        <button
+                                            onClick={() => {
+                                                setIsAddingIngredient(false)
+                                                setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '', isSyncedFromInventory: false, inventoryItemId: null })
+                                                setMatchedInventoryItem(null)
+                                            }}
+                                            className="flex-1 px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-[0.98]"
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            onClick={handleAddIngredient}
+                                            disabled={!newIngredient.name || !newIngredient.quantity}
+                                            className="flex-[2] px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-white bg-zinc-900 dark:bg-white dark:text-zinc-900 shadow-lg shadow-zinc-900/20 hover:shadow-xl active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+                                        >
+                                            Adicionar
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {/* Ingredients Table - Desktop */}
                     {selectedPizza.ingredients.length > 0 && (

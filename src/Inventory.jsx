@@ -119,6 +119,13 @@ export default function Inventory() {
     const [newCategoryName, setNewCategoryName] = useState('')
     const [newSubcategoryName, setNewSubcategoryName] = useState('')
 
+    // Listen for FAB button click from App.jsx
+    useEffect(() => {
+        const handleOpenManagement = () => setIsManagingCategories(true)
+        window.addEventListener('open-management-modal', handleOpenManagement)
+        return () => window.removeEventListener('open-management-modal', handleOpenManagement)
+    }, [])
+
     const [newItem, setNewItem] = useState({
         name: '',
         packageQuantity: '',
@@ -497,181 +504,197 @@ export default function Inventory() {
             </section>
 
             {/* Add Item Modal - Premium Bottom Sheet */}
-            {isAddingItem && (
-                <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-                    <ModalScrollLock />
-                    {/* Backdrop */}
-                    <div
-                        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
-                        onClick={() => setIsAddingItem(false)}
-                    ></div>
+            <AnimatePresence>
+                {isAddingItem && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4"
+                    >
+                        <ModalScrollLock />
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+                            onClick={() => setIsAddingItem(false)}
+                        />
 
-                    {/* Modal Content */}
-                    <div className="relative w-full md:max-w-2xl bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-[2rem] p-6 pb-8 md:p-8 shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto custom-scrollbar">
+                        {/* Modal Content */}
+                        <motion.div
+                            initial={{ y: "100%", opacity: 0.5 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: "100%", opacity: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="relative w-full md:max-w-2xl bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-[2rem] p-6 pb-8 md:p-8 shadow-2xl max-h-[90dvh] overflow-y-auto custom-scrollbar"
+                        >
 
-                        {/* Drag Handle (Mobile only) */}
-                        <div className="md:hidden w-full flex justify-center mb-6">
-                            <div className="w-12 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700/50"></div>
-                        </div>
-
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Novo Item</h3>
-                            <button
-                                onClick={() => setIsAddingItem(false)}
-                                className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5">
-                            {/* Name */}
-                            <div className="sm:col-span-2 lg:col-span-12">
-                                <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Nome do Item</label>
-                                <input
-                                    type="text"
-                                    className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white font-semibold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
-                                    placeholder="Ex: Farinha de Trigo"
-                                    value={newItem.name}
-                                    onChange={(e) => setNewItem(prev => ({ ...prev, name: e.target.value }))}
-                                    autoFocus
-                                />
+                            {/* Drag Handle (Mobile only) */}
+                            <div className="md:hidden w-full flex justify-center mb-6">
+                                <div className="w-12 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700/50"></div>
                             </div>
 
-                            {/* Package Details Section */}
-                            <div className="lg:col-span-12 grid grid-cols-2 gap-4">
-                                {/* Package Quantity */}
-                                <div>
-                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Qtd/Pacote</label>
-                                    <div className="flex gap-2">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Novo Item</h3>
+                                <button
+                                    onClick={() => setIsAddingItem(false)}
+                                    className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5">
+                                {/* Name */}
+                                <div className="sm:col-span-2 lg:col-span-12">
+                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Nome do Item</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white font-semibold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
+                                        placeholder="Ex: Farinha de Trigo"
+                                        value={newItem.name}
+                                        onChange={(e) => setNewItem(prev => ({ ...prev, name: e.target.value }))}
+                                        autoFocus
+                                    />
+                                </div>
+
+                                {/* Package Details Section */}
+                                <div className="lg:col-span-12 grid grid-cols-2 gap-4">
+                                    {/* Package Quantity */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Qtd/Pacote</label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                inputMode="decimal"
+                                                className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right font-bold text-lg focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
+                                                placeholder="25"
+                                                value={newItem.packageQuantity}
+                                                onChange={(e) => setNewItem(prev => ({ ...prev, packageQuantity: e.target.value }))}
+                                            />
+                                            <select
+                                                className="w-24 px-2 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all text-center appearance-none"
+                                                value={newItem.unit}
+                                                onChange={(e) => setNewItem(prev => ({ ...prev, unit: e.target.value }))}
+                                            >
+                                                <option value="kg">kg</option>
+                                                <option value="g">g</option>
+                                                <option value="L">L</option>
+                                                <option value="ml">ml</option>
+                                                <option value="un">un</option>
+                                                <option value="cx">cx</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* Package Count */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Nº Pacotes</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
+                                            className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right font-bold text-lg focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
+                                            placeholder="1"
+                                            value={newItem.packageCount}
+                                            onChange={(e) => setNewItem(prev => ({ ...prev, packageCount: e.target.value }))}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Price Section */}
+                                <div className="lg:col-span-6">
+                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Preço por Pacote</label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 font-medium">$</span>
                                         <input
                                             type="number"
                                             step="0.01"
                                             inputMode="decimal"
-                                            className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right font-bold text-lg focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
-                                            placeholder="25"
-                                            value={newItem.packageQuantity}
-                                            onChange={(e) => setNewItem(prev => ({ ...prev, packageQuantity: e.target.value }))}
+                                            className="w-full pl-8 pr-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right font-bold text-lg focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
+                                            placeholder="0.00"
+                                            value={newItem.pricePerUnit}
+                                            onChange={(e) => setNewItem(prev => ({ ...prev, pricePerUnit: e.target.value }))}
                                         />
-                                        <select
-                                            className="w-24 px-2 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all text-center appearance-none"
-                                            value={newItem.unit}
-                                            onChange={(e) => setNewItem(prev => ({ ...prev, unit: e.target.value }))}
-                                        >
-                                            <option value="kg">kg</option>
-                                            <option value="g">g</option>
-                                            <option value="L">L</option>
-                                            <option value="ml">ml</option>
-                                            <option value="un">un</option>
-                                            <option value="cx">cx</option>
-                                        </select>
                                     </div>
                                 </div>
 
-                                {/* Package Count */}
-                                <div>
-                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Nº Pacotes</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        inputMode="numeric"
-                                        pattern="[0-9]*"
-                                        className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right font-bold text-lg focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
-                                        placeholder="1"
-                                        value={newItem.packageCount}
-                                        onChange={(e) => setNewItem(prev => ({ ...prev, packageCount: e.target.value }))}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Price Section */}
-                            <div className="lg:col-span-6">
-                                <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Preço por Pacote</label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 font-medium">$</span>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        inputMode="decimal"
-                                        className="w-full pl-8 pr-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right font-bold text-lg focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
-                                        placeholder="0.00"
-                                        value={newItem.pricePerUnit}
-                                        onChange={(e) => setNewItem(prev => ({ ...prev, pricePerUnit: e.target.value }))}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Category */}
-                            <div className={newItem.category === 'Ingredientes' ? 'lg:col-span-6' : 'lg:col-span-12'}>
-                                <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Categoria</label>
-                                <select
-                                    className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all appearance-none"
-                                    value={newItem.category}
-                                    onChange={(e) => setNewItem(prev => ({ ...prev, category: e.target.value, subcategory: e.target.value === 'Ingredientes' ? 'Outros Ingredientes' : null }))}
-                                >
-                                    {categories.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Subcategory (only for Ingredientes) */}
-                            {newItem.category === 'Ingredientes' && (
-                                <div className="lg:col-span-6">
-                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Subcategoria</label>
+                                {/* Category */}
+                                <div className={newItem.category === 'Ingredientes' ? 'lg:col-span-6' : 'lg:col-span-12'}>
+                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Categoria</label>
                                     <select
                                         className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all appearance-none"
-                                        value={newItem.subcategory}
-                                        onChange={(e) => setNewItem(prev => ({ ...prev, subcategory: e.target.value }))}
+                                        value={newItem.category}
+                                        onChange={(e) => setNewItem(prev => ({ ...prev, category: e.target.value, subcategory: e.target.value === 'Ingredientes' ? 'Outros Ingredientes' : null }))}
                                     >
-                                        {subcategories.map(sub => (
-                                            <option key={sub} value={sub}>{sub}</option>
+                                        {categories.map(cat => (
+                                            <option key={cat} value={cat}>{cat}</option>
                                         ))}
                                     </select>
                                 </div>
-                            )}
-                        </div>
 
-                        {/* Total Preview */}
-                        {newItem.packageQuantity && newItem.packageCount && (
-                            <div className="mt-6 p-5 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 shadow-inner">
-                                <div className="flex items-center justify-between">
-                                    <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Resumo</div>
-                                    <div className="text-right">
-                                        <div className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
-                                            {Number(newItem.packageQuantity) * Number(newItem.packageCount)} {newItem.unit} Total
-                                        </div>
-                                        {newItem.pricePerUnit && (
-                                            <div className="text-2xl font-bold text-zinc-900 dark:text-white mt-1 tracking-tight tabular-nums">
-                                                {formatCurrency(Number(newItem.packageCount) * Number(newItem.pricePerUnit))}
+                                {/* Subcategory (only for Ingredientes) */}
+                                {newItem.category === 'Ingredientes' && (
+                                    <div className="lg:col-span-6">
+                                        <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Subcategoria</label>
+                                        <select
+                                            className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all appearance-none"
+                                            value={newItem.subcategory}
+                                            onChange={(e) => setNewItem(prev => ({ ...prev, subcategory: e.target.value }))}
+                                        >
+                                            {subcategories.map(sub => (
+                                                <option key={sub} value={sub}>{sub}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Total Preview */}
+                            {newItem.packageQuantity && newItem.packageCount && (
+                                <div className="mt-6 p-5 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 shadow-inner">
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Resumo</div>
+                                        <div className="text-right">
+                                            <div className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
+                                                {Number(newItem.packageQuantity) * Number(newItem.packageCount)} {newItem.unit} Total
                                             </div>
-                                        )}
+                                            {newItem.pricePerUnit && (
+                                                <div className="text-2xl font-bold text-zinc-900 dark:text-white mt-1 tracking-tight tabular-nums">
+                                                    {formatCurrency(Number(newItem.packageCount) * Number(newItem.pricePerUnit))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-3 mt-8 safe-area-bottom">
-                            <button
-                                onClick={() => setIsAddingItem(false)}
-                                className="flex-1 px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-[0.98]"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleAddItem}
-                                disabled={!newItem.name.trim()}
-                                className="flex-[2] px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-white bg-zinc-900 dark:bg-white dark:text-zinc-900 shadow-lg shadow-zinc-900/10 hover:shadow-xl hover:shadow-zinc-900/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-                            >
-                                Adicionar ao Estoque
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                            {/* Action Buttons */}
+                            <div className="flex gap-3 mt-8 safe-area-bottom">
+                                <button
+                                    onClick={() => setIsAddingItem(false)}
+                                    className="flex-1 px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-[0.98]"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleAddItem}
+                                    disabled={!newItem.name.trim()}
+                                    className="flex-[2] px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-wider text-white bg-zinc-900 dark:bg-white dark:text-zinc-900 shadow-lg shadow-zinc-900/10 hover:shadow-xl hover:shadow-zinc-900/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                                >
+                                    Adicionar ao Estoque
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Search Bar - Premium Apple Design */}
             <section className="relative z-10 mb-6">
@@ -1138,7 +1161,7 @@ export default function Inventory() {
 
             {/* Category Management Modal */}
             {isManagingCategories && (
-                <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+                <div className="fixed inset-0 z-50 flex items-stretch md:items-center justify-center md:p-4">
                     <ModalScrollLock />
                     {/* Backdrop */}
                     <div
@@ -1146,19 +1169,29 @@ export default function Inventory() {
                         onClick={() => setIsManagingCategories(false)}
                     ></div>
 
-                    {/* Modal Content */}
-                    <div className="relative w-full md:max-w-lg bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-[2rem] p-6 pb-8 md:p-8 shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto custom-scrollbar">
+                    {/* Modal Content - Full screen on mobile with safe areas */}
+                    <div
+                        className="relative w-full h-full md:h-auto md:max-w-lg bg-white dark:bg-zinc-900 md:rounded-[2rem] shadow-2xl md:max-h-[85vh] overflow-hidden flex flex-col"
+                        style={{
+                            paddingTop: 'env(safe-area-inset-top)',
+                            paddingBottom: 'env(safe-area-inset-bottom)',
+                            paddingLeft: 'env(safe-area-inset-left)',
+                            paddingRight: 'env(safe-area-inset-right)'
+                        }}
+                    >
 
-                        {/* Drag Handle (Mobile only) */}
-                        <div className="md:hidden w-full flex justify-center mb-6">
-                            <div className="w-12 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700/50"></div>
+                        {/* Mobile Close Area - Tap anywhere at top */}
+                        <div className="md:hidden w-full flex flex-col items-center pt-3 pb-2 shrink-0 border-b border-zinc-100 dark:border-zinc-800" onClick={() => setIsManagingCategories(false)}>
+                            <div className="w-10 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700 mb-1"></div>
+                            <span className="text-[9px] font-medium text-zinc-400 uppercase tracking-wider">Arraste para fechar</span>
                         </div>
 
-                        <div className="flex items-center justify-between mb-6">
+                        {/* Sticky Header */}
+                        <div className="flex items-center justify-between px-6 py-4 md:p-6 shrink-0 sticky top-0 bg-white dark:bg-zinc-900 z-10 border-b border-zinc-100 dark:border-zinc-800 md:border-none">
                             <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Gerenciar Categorias</h3>
                             <button
                                 onClick={() => setIsManagingCategories(false)}
-                                className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+                                className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors active:scale-95"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -1166,186 +1199,189 @@ export default function Inventory() {
                             </button>
                         </div>
 
-                        {/* Categories List */}
-                        <div className="space-y-4 mb-6">
-                            <div className="space-y-2">
-                                <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Categorias Principais</h4>
+                        {/* Scrollable Content Area */}
+                        <div className="overflow-y-auto flex-1 px-6 pb-8 custom-scrollbar">
+                            {/* Categories List */}
+                            <div className="space-y-4 mb-6">
                                 <div className="space-y-2">
-                                    {categories.map((cat, idx) => (
-                                        <div key={idx} className="flex items-center justify-between py-3 px-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30">
-                                            <span className="font-medium text-indigo-700 dark:text-indigo-300">{cat}</span>
-                                            <button
-                                                onClick={() => {
-                                                    setConfirmModal({
-                                                        title: 'Excluir Categoria',
-                                                        message: `Excluir categoria "${cat}"? Itens desta categoria serão movidos para "Outros".`,
-                                                        type: 'danger',
-                                                        onConfirm: () => {
-                                                            setCategories(prev => prev.filter(c => c !== cat))
-                                                            setItems(prev => prev.map(item => item.category === cat ? { ...item, category: 'Outros' } : item))
-                                                            setConfirmModal(null)
-                                                            showToast('Categoria removida', 'success')
-                                                        },
-                                                        onCancel: () => setConfirmModal(null)
-                                                    })
-                                                }}
-                                                className="p-1.5 rounded-lg text-indigo-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    ))}
+                                    <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Categorias Principais</h4>
+                                    <div className="space-y-2">
+                                        {categories.map((cat, idx) => (
+                                            <div key={idx} className="flex items-center justify-between py-3 px-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30">
+                                                <span className="font-medium text-indigo-700 dark:text-indigo-300">{cat}</span>
+                                                <button
+                                                    onClick={() => {
+                                                        setConfirmModal({
+                                                            title: 'Excluir Categoria',
+                                                            message: `Excluir categoria "${cat}"? Itens desta categoria serão movidos para "Outros".`,
+                                                            type: 'danger',
+                                                            onConfirm: () => {
+                                                                setCategories(prev => prev.filter(c => c !== cat))
+                                                                setItems(prev => prev.map(item => item.category === cat ? { ...item, category: 'Outros' } : item))
+                                                                setConfirmModal(null)
+                                                                showToast('Categoria removida', 'success')
+                                                            },
+                                                            onCancel: () => setConfirmModal(null)
+                                                        })
+                                                    }}
+                                                    className="p-1.5 rounded-lg text-indigo-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Add New Category */}
-                            <div className="pt-4 border-t border-indigo-100 dark:border-indigo-800/30">
-                                <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-3">Adicionar Nova Categoria</h4>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        className="flex-1 px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 text-zinc-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-indigo-400"
-                                        placeholder="Nome da categoria"
-                                        value={newCategoryName}
-                                        onChange={(e) => setNewCategoryName(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && newCategoryName.trim()) {
-                                                if (!categories.includes(newCategoryName.trim())) {
+                                {/* Add New Category */}
+                                <div className="pt-4 border-t border-indigo-100 dark:border-indigo-800/30">
+                                    <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-3">Adicionar Nova Categoria</h4>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            className="flex-1 px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 text-zinc-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-indigo-400"
+                                            placeholder="Nome da categoria"
+                                            value={newCategoryName}
+                                            onChange={(e) => setNewCategoryName(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && newCategoryName.trim()) {
+                                                    if (!categories.includes(newCategoryName.trim())) {
+                                                        setCategories(prev => [...prev, newCategoryName.trim()])
+                                                        setNewCategoryName('')
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                if (newCategoryName.trim() && !categories.includes(newCategoryName.trim())) {
                                                     setCategories(prev => [...prev, newCategoryName.trim()])
                                                     setNewCategoryName('')
                                                 }
-                                            }
-                                        }}
-                                    />
-                                    <button
-                                        onClick={() => {
-                                            if (newCategoryName.trim() && !categories.includes(newCategoryName.trim())) {
-                                                setCategories(prev => [...prev, newCategoryName.trim()])
-                                                setNewCategoryName('')
-                                            }
-                                        }}
-                                        disabled={!newCategoryName.trim()}
-                                        className="px-5 py-3 bg-indigo-500 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                                        </svg>
-                                    </button>
+                                            }}
+                                            disabled={!newCategoryName.trim()}
+                                            className="px-5 py-3 bg-indigo-500 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Reset Categories */}
-                            <button
-                                onClick={() => {
-                                    setConfirmModal({
-                                        title: 'Restaurar Categorias',
-                                        message: 'Deseja restaurar as categorias padrão? Categorias personalizadas serão mantidas se houverem itens nelas, mas a lista principal será resetada.',
-                                        type: 'default',
-                                        onConfirm: () => {
-                                            setCategories(defaultCategories)
-                                            setConfirmModal(null)
-                                            showToast('Categorias restauradas', 'success')
-                                        },
-                                        onCancel: () => setConfirmModal(null)
-                                    })
-                                }}
-                                className="w-full py-2 text-indigo-500 dark:text-indigo-400 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:text-indigo-700 dark:hover:text-indigo-300 transition-all"
-                            >
-                                Restaurar Categorias Padrão
-                            </button>
-                        </div>
-
-                        {/* Subcategories List */}
-                        <div className="space-y-4 pt-6 border-t border-zinc-100 dark:border-zinc-700">
-                            <div className="space-y-2">
-                                <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Subcategorias de Ingredientes</h4>
-                                <div className="space-y-2">
-                                    {subcategories.map((sub, idx) => (
-                                        <div key={idx} className="flex items-center justify-between py-3 px-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-700">
-                                            <span className="font-medium text-zinc-700 dark:text-zinc-300">{sub}</span>
-                                            <button
-                                                onClick={() => {
-                                                    setConfirmModal({
-                                                        title: 'Excluir Subcategoria',
-                                                        message: `Deseja excluir a subcategoria "${sub}"?`,
-                                                        type: 'danger',
-                                                        onConfirm: () => {
-                                                            setSubcategories(prev => prev.filter(s => s !== sub))
-                                                            setConfirmModal(null)
-                                                            showToast('Subcategoria removida', 'success')
-                                                        },
-                                                        onCancel: () => setConfirmModal(null)
-                                                    })
-                                                }}
-                                                className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Add New Subcategory */}
-                            <div className="pt-4 border-t border-zinc-100 dark:border-zinc-700">
-                                <h4 className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3">Adicionar Nova Subcategoria</h4>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        className="flex-1 px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all placeholder:text-zinc-400"
-                                        placeholder="Nome da subcategoria"
-                                        value={newSubcategoryName}
-                                        onChange={(e) => setNewSubcategoryName(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && newSubcategoryName.trim()) {
-                                                if (!subcategories.includes(newSubcategoryName.trim())) {
-                                                    setSubcategories(prev => [...prev, newSubcategoryName.trim()])
-                                                    setNewSubcategoryName('')
-                                                }
-                                            }
-                                        }}
-                                    />
-                                    <button
-                                        onClick={() => {
-                                            if (newSubcategoryName.trim() && !subcategories.includes(newSubcategoryName.trim())) {
-                                                setSubcategories(prev => [...prev, newSubcategoryName.trim()])
-                                                setNewSubcategoryName('')
-                                            }
-                                        }}
-                                        disabled={!newSubcategoryName.trim()}
-                                        className="px-5 py-3 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Reset to Default */}
-                            <div className="pt-4">
+                                {/* Reset Categories */}
                                 <button
                                     onClick={() => {
                                         setConfirmModal({
-                                            title: 'Restaurar Subcategorias',
-                                            message: 'Restaurar subcategorias padrão? Isso removerá todas as subcategorias personalizadas.',
-                                            type: 'danger',
+                                            title: 'Restaurar Categorias',
+                                            message: 'Deseja restaurar as categorias padrão? Categorias personalizadas serão mantidas se houverem itens nelas, mas a lista principal será resetada.',
+                                            type: 'default',
                                             onConfirm: () => {
-                                                setSubcategories(defaultIngredientSubcategories)
+                                                setCategories(defaultCategories)
                                                 setConfirmModal(null)
-                                                showToast('Subcategorias restauradas', 'success')
+                                                showToast('Categorias restauradas', 'success')
                                             },
                                             onCancel: () => setConfirmModal(null)
                                         })
                                     }}
-                                    className="w-full py-3 text-zinc-500 dark:text-zinc-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:text-zinc-700 dark:hover:text-zinc-300 transition-all"
+                                    className="w-full py-2 text-indigo-500 dark:text-indigo-400 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:text-indigo-700 dark:hover:text-indigo-300 transition-all"
                                 >
-                                    Restaurar Padrões
+                                    Restaurar Categorias Padrão
                                 </button>
+                            </div>
+
+                            {/* Subcategories List */}
+                            <div className="space-y-4 pt-6 border-t border-zinc-100 dark:border-zinc-700">
+                                <div className="space-y-2">
+                                    <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Subcategorias de Ingredientes</h4>
+                                    <div className="space-y-2">
+                                        {subcategories.map((sub, idx) => (
+                                            <div key={idx} className="flex items-center justify-between py-3 px-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-700">
+                                                <span className="font-medium text-zinc-700 dark:text-zinc-300">{sub}</span>
+                                                <button
+                                                    onClick={() => {
+                                                        setConfirmModal({
+                                                            title: 'Excluir Subcategoria',
+                                                            message: `Deseja excluir a subcategoria "${sub}"?`,
+                                                            type: 'danger',
+                                                            onConfirm: () => {
+                                                                setSubcategories(prev => prev.filter(s => s !== sub))
+                                                                setConfirmModal(null)
+                                                                showToast('Subcategoria removida', 'success')
+                                                            },
+                                                            onCancel: () => setConfirmModal(null)
+                                                        })
+                                                    }}
+                                                    className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Add New Subcategory */}
+                                <div className="pt-4 border-t border-zinc-100 dark:border-zinc-700">
+                                    <h4 className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3">Adicionar Nova Subcategoria</h4>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            className="flex-1 px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all placeholder:text-zinc-400"
+                                            placeholder="Nome da subcategoria"
+                                            value={newSubcategoryName}
+                                            onChange={(e) => setNewSubcategoryName(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && newSubcategoryName.trim()) {
+                                                    if (!subcategories.includes(newSubcategoryName.trim())) {
+                                                        setSubcategories(prev => [...prev, newSubcategoryName.trim()])
+                                                        setNewSubcategoryName('')
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                if (newSubcategoryName.trim() && !subcategories.includes(newSubcategoryName.trim())) {
+                                                    setSubcategories(prev => [...prev, newSubcategoryName.trim()])
+                                                    setNewSubcategoryName('')
+                                                }
+                                            }}
+                                            disabled={!newSubcategoryName.trim()}
+                                            className="px-5 py-3 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Reset to Default */}
+                                <div className="pt-4">
+                                    <button
+                                        onClick={() => {
+                                            setConfirmModal({
+                                                title: 'Restaurar Subcategorias',
+                                                message: 'Restaurar subcategorias padrão? Isso removerá todas as subcategorias personalizadas.',
+                                                type: 'danger',
+                                                onConfirm: () => {
+                                                    setSubcategories(defaultIngredientSubcategories)
+                                                    setConfirmModal(null)
+                                                    showToast('Subcategorias restauradas', 'success')
+                                                },
+                                                onCancel: () => setConfirmModal(null)
+                                            })
+                                        }}
+                                        className="w-full py-3 text-zinc-500 dark:text-zinc-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:text-zinc-700 dark:hover:text-zinc-300 transition-all"
+                                    >
+                                        Restaurar Padrões
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

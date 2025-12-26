@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { useScrollLock } from './hooks/useScrollLock'
 import { FirebaseService } from './services/firebaseService'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -13,6 +14,13 @@ export default function Costs() {
     // Category Edit Mode
     const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false)
     const [newCatName, setNewCatName] = useState('')
+
+    // Listen for FAB button click from App.jsx
+    useEffect(() => {
+        const handleOpenManagement = () => setIsModalOpen(true)
+        window.addEventListener('open-management-modal', handleOpenManagement)
+        return () => window.removeEventListener('open-management-modal', handleOpenManagement)
+    }, [])
 
     const [dashboardTitle, setDashboardTitle] = useState('Global Investment Matrix')
     const [isEditingTitle, setIsEditingTitle] = useState(false)
@@ -620,6 +628,9 @@ export default function Costs() {
             {/* Modal: Ultra-Compact Apple Pro Interface */}
             <AnimatePresence>
                 {isModalOpen && (
+                    <ModalScrollLock />
+                )}
+                {isModalOpen && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -641,22 +652,23 @@ export default function Costs() {
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: "100%", opacity: 0 }}
                             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="relative bg-zinc-100 dark:bg-zinc-900 w-full max-w-sm rounded-t-[2.5rem] md:rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border-t border-white/20 dark:border-white/5 flex flex-col overflow-hidden max-h-[85vh] md:max-h-[80vh]"
+                            className="relative bg-zinc-100 dark:bg-zinc-900 w-full md:max-w-sm rounded-t-[2rem] md:rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border-t border-white/20 dark:border-white/5 flex flex-col overflow-hidden max-h-[90dvh] md:max-h-[80vh]"
                         >
 
-                            {/* Minimal Drag Handle */}
-                            <div className="md:hidden w-full flex justify-center pt-4 pb-1 shrink-0">
-                                <div className="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-800"></div>
+                            {/* Mobile Close Area - Tap anywhere at top */}
+                            <div className="md:hidden w-full flex flex-col items-center pt-3 pb-2 shrink-0" onClick={closeModal}>
+                                <div className="w-10 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700 mb-1"></div>
+                                <span className="text-[9px] font-medium text-zinc-400 uppercase tracking-wider">Arraste para fechar</span>
                             </div>
 
                             {/* Compact Header */}
-                            <div className="px-6 py-4 flex justify-between items-center shrink-0">
+                            <div className="px-6 py-3 md:py-4 flex justify-between items-center shrink-0 sticky top-0 bg-zinc-100 dark:bg-zinc-900 z-10 border-b border-zinc-200/50 dark:border-white/5 md:border-none">
                                 <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
                                     {editingId ? 'Editar Despesa' : 'Nova Despesa'}
                                 </h3>
                                 <button
                                     onClick={closeModal}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all active:scale-90"
+                                    className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all active:scale-90"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
@@ -810,6 +822,9 @@ export default function Costs() {
             {/* Premium Confirmation Modal - Director Standard */}
             <AnimatePresence>
                 {confirmModal && (
+                    <ModalScrollLock />
+                )}
+                {confirmModal && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -863,4 +878,10 @@ export default function Costs() {
             </AnimatePresence>
         </div>
     )
+}
+
+// Helper component for scroll lock
+function ModalScrollLock() {
+    useScrollLock()
+    return null
 }
