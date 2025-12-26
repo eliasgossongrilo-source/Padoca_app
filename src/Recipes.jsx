@@ -195,7 +195,7 @@ const RecipeCategoryModal = ({ categories, onClose, onUpdate, onRenameCategory }
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+                        className="p-3 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors touch-manipulation"
                     >
                         <Icons.Close className="w-5 h-5" />
                     </button>
@@ -282,7 +282,7 @@ const RecipeCategoryModal = ({ categories, onClose, onUpdate, onRenameCategory }
                                 {/* Delete */}
                                 <button
                                     onClick={() => setConfirmDelete(cat)}
-                                    className="p-2 rounded-lg text-indigo-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all opacity-0 group-hover:opacity-100"
+                                    className="p-3 rounded-lg text-indigo-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 touch-manipulation"
                                 >
                                     <Icons.Trash className="w-4 h-4" />
                                 </button>
@@ -374,7 +374,8 @@ const IngredientItem = React.memo(({ item, onUpdate, onDelete, onNext, isEditing
                         onKeyDown={e => {
                             if (e.key === 'Enter') {
                                 e.preventDefault()
-                                document.getElementById(`ing-qty-${item.id}`)?.focus()
+                                const qtyField = document.getElementById(`ing-qty-${item.id}`)
+                                if (qtyField) qtyField.focus()
                             }
                         }}
                         className="flex-1 bg-transparent outline-none font-medium text-[15px] leading-[1.4] tracking-[-0.011em] text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-300 dark:placeholder:text-zinc-700 transition-colors duration-150 min-w-0"
@@ -432,7 +433,7 @@ const IngredientItem = React.memo(({ item, onUpdate, onDelete, onNext, isEditing
                     {isEditing && (
                         <button
                             onClick={onDelete}
-                            className="p-1.5 text-zinc-300 dark:text-zinc-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors duration-150 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                            className="p-3 text-zinc-300 dark:text-zinc-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors duration-150 opacity-100 md:opacity-0 md:group-hover:opacity-100 touch-manipulation"
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -515,7 +516,7 @@ const InstructionItem = React.memo(({ item, index, onUpdate, onDelete, onNext, i
                 {isEditing && (
                     <button
                         onClick={onDelete}
-                        className="p-1.5 text-zinc-300 dark:text-zinc-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors duration-150 opacity-100 md:opacity-0 md:group-hover:opacity-100 mt-0.5"
+                        className="p-3 text-zinc-300 dark:text-zinc-700 hover:text-rose-500 dark:hover:text-rose-400 transition-colors duration-150 opacity-100 md:opacity-0 md:group-hover:opacity-100 mt-0.5 touch-manipulation"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1347,11 +1348,7 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
                             onDelete={() => onUpdate({ ...section, items: section.items.filter(i => i.id !== item.id) })}
                             onNext={() => {
                                 if (!item.name.trim()) return
-                                const newId = Date.now()
-                                onUpdate({ ...section, items: [...section.items, { id: newId, name: '', quantity: '', unit: 'g' }] })
-                                setTimeout(() => {
-                                    document.getElementById(`ing-name-${newId}`)?.focus()
-                                }, 50)
+                                onUpdate({ ...section, items: [...section.items, { id: Date.now(), name: '', quantity: '', unit: 'g' }] })
                             }}
                             isEditing={isEditing}
                         />
@@ -1423,12 +1420,7 @@ function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditin
                         onDelete={() => onUpdate({ ...section, items: section.items.filter(i => i.id !== item.id) })}
                         onNext={() => {
                             if (!item.text.trim()) return
-                            const newId = Date.now()
-                            onUpdate({ ...section, items: [...section.items, { id: newId, text: '' }] })
-                            setTimeout(() => {
-                                const newField = document.querySelector(`textarea[value=""]`)
-                                newField?.focus()
-                            }, 50)
+                            onUpdate({ ...section, items: [...section.items, { id: Date.now(), text: '' }] })
                         }}
                         isEditing={isEditing}
                     />
