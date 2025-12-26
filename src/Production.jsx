@@ -1,9 +1,11 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react'
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import BufferedInput from './BufferedInput.jsx'
 import YeastType from './YeastType.jsx'
 import Preferment from './Preferment.jsx'
 import { loadAllRecipes, saveAllRecipes } from './storage.js'
 import { FirebaseService } from './services/firebaseService'
+import { motion, AnimatePresence } from 'framer-motion'
 
 /**
  * Production - Premium dough production calculator
@@ -50,11 +52,11 @@ export default function Production({ inputMode, setInputMode }) {
     // Premium Toast System
     const [toastMessage, setToastMessage] = useState(null)
     const toastTimeoutRef = useRef(null)
-    const showToast = (message, type = 'success') => {
+    const showToast = useCallback((message, type = 'success') => {
         if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current)
         setToastMessage({ message, type })
         toastTimeoutRef.current = setTimeout(() => setToastMessage(null), 3500)
-    }
+    }, [])
 
     const [gramsInputs, setGramsInputs] = useState({
         flour: 1736,
@@ -800,101 +802,126 @@ export default function Production({ inputMode, setInputMode }) {
                 )}
             </section>
             {/* Premium Confirmation Modal */}
-            {confirmModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
-                        onClick={confirmModal.onCancel}
-                    />
-                    <div className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden animate-slide-up">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${confirmModal.type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                {confirmModal.type === 'danger' ? (
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                ) : (
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                )}
-                            </svg>
-                        </div>
-                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">{confirmModal.title}</h3>
-                        <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-6 leading-relaxed">
-                            {confirmModal.message}
-                        </p>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={confirmModal.onCancel}
-                                className="flex-1 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={confirmModal.onConfirm}
-                                className={`flex-1 py-3 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all ${confirmModal.type === 'danger' ? 'bg-rose-500 shadow-rose-500/20' : 'bg-zinc-900 dark:bg-white dark:text-zinc-900'}`}
-                            >
-                                Confirmar
-                            </button>
-                        </div>
+            <AnimatePresence>
+                {confirmModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+                            onClick={confirmModal.onCancel}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                            className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+                        >
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${confirmModal.type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    {confirmModal.type === 'danger' ? (
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    ) : (
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    )}
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">{confirmModal.title}</h3>
+                            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-6 leading-relaxed">
+                                {confirmModal.message}
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={confirmModal.onCancel}
+                                    className="flex-1 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={confirmModal.onConfirm}
+                                    className={`flex-1 py-3 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all ${confirmModal.type === 'danger' ? 'bg-rose-500 shadow-rose-500/20' : 'bg-zinc-900 dark:bg-white dark:text-zinc-900'}`}
+                                >
+                                    Confirmar
+                                </button>
+                            </div>
+                        </motion.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
 
             {/* Premium Input Modal */}
-            {inputModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
-                        onClick={inputModal.onCancel}
-                    />
-                    <div className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden animate-slide-up">
-                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">{inputModal.title}</h3>
-                        <input
-                            autoFocus
-                            defaultValue={inputModal.defaultValue}
-                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-black/20 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white mb-6 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white"
-                            placeholder={inputModal.placeholder}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    inputModal.onConfirm(e.target.value)
-                                }
-                            }}
+            <AnimatePresence>
+                {inputModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+                            onClick={inputModal.onCancel}
                         />
-                        <div className="flex gap-3">
-                            <button
-                                onClick={inputModal.onCancel}
-                                className="flex-1 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    // Find input value
-                                    const input = e.target.closest('.relative').querySelector('input')
-                                    inputModal.onConfirm(input.value)
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+                        >
+                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">{inputModal.title}</h3>
+                            <input
+                                autoFocus
+                                defaultValue={inputModal.defaultValue}
+                                className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-black/20 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white mb-6 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white"
+                                placeholder={inputModal.placeholder}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        inputModal.onConfirm(e.target.value)
+                                    }
                                 }}
-                                className="flex-1 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all"
-                            >
-                                Salvar
-                            </button>
-                        </div>
+                            />
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={inputModal.onCancel}
+                                    className="flex-1 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        const input = e.target.closest('.relative').querySelector('input')
+                                        inputModal.onConfirm(input.value)
+                                    }}
+                                    className="flex-1 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all"
+                                >
+                                    Salvar
+                                </button>
+                            </div>
+                        </motion.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
 
             {/* Premium Toast */}
-            {toastMessage && (
-                <div
-                    className={`fixed top-6 left-1/2 -translate-x-1/2 z-[20000] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-xl border animate-fade-in ${toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400/20 text-white' :
-                        toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400/20 text-white' :
-                            'bg-zinc-900/90 border-white/10 text-white'
-                        }`}
-                >
-                    <div className={`w-2 h-2 rounded-full ${toastMessage.type === 'error' ? 'bg-white animate-pulse' :
-                        toastMessage.type === 'success' ? 'bg-white' :
-                            'bg-indigo-400'
-                        }`} />
-                    <span className="text-sm font-semibold tracking-tight">{toastMessage.message}</span>
-                </div>
-            )}
+            <AnimatePresence>
+                {toastMessage && createPortal(
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                        className={`fixed top-6 left-1/2 -translate-x-1/2 z-[20000] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-xl border ${toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400/20 text-white' :
+                            toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400/20 text-white' :
+                                'bg-zinc-900/90 border-white/10 text-white'
+                            }`}
+                    >
+                        <div className={`w-2 h-2 rounded-full ${toastMessage.type === 'error' ? 'bg-white animate-pulse' :
+                            toastMessage.type === 'success' ? 'bg-white' :
+                                'bg-indigo-400'
+                            }`} />
+                        <span className="text-sm font-semibold tracking-tight">{toastMessage.message}</span>
+                    </motion.div>,
+                    document.body
+                )}
+            </AnimatePresence>
         </div>
     )
 }

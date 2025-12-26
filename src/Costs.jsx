@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { FirebaseService } from './services/firebaseService'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Costs() {
     const [costs, setCosts] = useState([])
@@ -18,12 +20,14 @@ export default function Costs() {
     const [taxRate, setTaxRate] = useState(0.13)
     const [isEditingTax, setIsEditingTax] = useState(false)
 
-    // UI Feedback
-    const [toast, setToast] = useState(null)
-    const showToast = (msg) => {
-        setToast(msg)
-        setTimeout(() => setToast(null), 3000)
-    }
+    // Premium Toast System
+    const [toastMessage, setToastMessage] = useState(null)
+    const toastTimeoutRef = useRef(null)
+    const showToast = useCallback((message, type = 'success') => {
+        if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current)
+        setToastMessage({ message, type })
+        toastTimeoutRef.current = setTimeout(() => setToastMessage(null), 3500)
+    }, [])
 
     // Form State
     const [formData, setFormData] = useState({
@@ -765,13 +769,27 @@ export default function Costs() {
                 </div>
             )}
 
-            {/* Subtle Toast */}
-            {toast && (
-                <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[100] bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-slide-up border border-white/10">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest">{toast}</span>
-                </div>
-            )}
+            {/* Premium Toast */}
+            <AnimatePresence>
+                {toastMessage && createPortal(
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                        className={`fixed top-6 left-1/2 -translate-x-1/2 z-[20000] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-xl border ${toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400/20 text-white' :
+                            toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400/20 text-white' :
+                                'bg-zinc-900/90 border-white/10 text-white'
+                            }`}
+                    >
+                        <div className={`w-2 h-2 rounded-full ${toastMessage.type === 'error' ? 'bg-white animate-pulse' :
+                            toastMessage.type === 'success' ? 'bg-white' :
+                                'bg-indigo-400'
+                            }`} />
+                        <span className="text-sm font-semibold tracking-tight">{toastMessage.message}</span>
+                    </motion.div>,
+                    document.body
+                )}
+            </AnimatePresence>
             {/* Premium Confirmation Modal */}
             {confirmModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">

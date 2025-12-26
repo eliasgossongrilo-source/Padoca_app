@@ -1173,10 +1173,18 @@ export default function Inventory() {
                                             <span className="font-medium text-indigo-700 dark:text-indigo-300">{cat}</span>
                                             <button
                                                 onClick={() => {
-                                                    if (confirm(`Excluir categoria "${cat}"? Itens desta categoria serão movidos para "Outros".`)) {
-                                                        setCategories(prev => prev.filter(c => c !== cat))
-                                                        setItems(prev => prev.map(item => item.category === cat ? { ...item, category: 'Outros' } : item))
-                                                    }
+                                                    setConfirmModal({
+                                                        title: 'Excluir Categoria',
+                                                        message: `Excluir categoria "${cat}"? Itens desta categoria serão movidos para "Outros".`,
+                                                        type: 'danger',
+                                                        onConfirm: () => {
+                                                            setCategories(prev => prev.filter(c => c !== cat))
+                                                            setItems(prev => prev.map(item => item.category === cat ? { ...item, category: 'Outros' } : item))
+                                                            setConfirmModal(null)
+                                                            showToast('Categoria removida', 'success')
+                                                        },
+                                                        onCancel: () => setConfirmModal(null)
+                                                    })
                                                 }}
                                                 className="p-1.5 rounded-lg text-indigo-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                                             >
@@ -1228,9 +1236,17 @@ export default function Inventory() {
                             {/* Reset Categories */}
                             <button
                                 onClick={() => {
-                                    if (confirm('Restaurar categorias padrão?')) {
-                                        setCategories(defaultCategories)
-                                    }
+                                    setConfirmModal({
+                                        title: 'Restaurar Categorias',
+                                        message: 'Deseja restaurar as categorias padrão? Categorias personalizadas serão mantidas se houverem itens nelas, mas a lista principal será resetada.',
+                                        type: 'default',
+                                        onConfirm: () => {
+                                            setCategories(defaultCategories)
+                                            setConfirmModal(null)
+                                            showToast('Categorias restauradas', 'success')
+                                        },
+                                        onCancel: () => setConfirmModal(null)
+                                    })
                                 }}
                                 className="w-full py-2 text-indigo-500 dark:text-indigo-400 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:text-indigo-700 dark:hover:text-indigo-300 transition-all"
                             >
@@ -1248,9 +1264,17 @@ export default function Inventory() {
                                             <span className="font-medium text-zinc-700 dark:text-zinc-300">{sub}</span>
                                             <button
                                                 onClick={() => {
-                                                    if (confirm(`Excluir subcategoria "${sub}"?`)) {
-                                                        setSubcategories(prev => prev.filter(s => s !== sub))
-                                                    }
+                                                    setConfirmModal({
+                                                        title: 'Excluir Subcategoria',
+                                                        message: `Deseja excluir a subcategoria "${sub}"?`,
+                                                        type: 'danger',
+                                                        onConfirm: () => {
+                                                            setSubcategories(prev => prev.filter(s => s !== sub))
+                                                            setConfirmModal(null)
+                                                            showToast('Subcategoria removida', 'success')
+                                                        },
+                                                        onCancel: () => setConfirmModal(null)
+                                                    })
                                                 }}
                                                 className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                                             >
@@ -1303,9 +1327,17 @@ export default function Inventory() {
                             <div className="pt-4">
                                 <button
                                     onClick={() => {
-                                        if (confirm('Restaurar subcategorias padrão? Isso removerá todas as subcategorias personalizadas.')) {
-                                            setSubcategories(defaultIngredientSubcategories)
-                                        }
+                                        setConfirmModal({
+                                            title: 'Restaurar Subcategorias',
+                                            message: 'Restaurar subcategorias padrão? Isso removerá todas as subcategorias personalizadas.',
+                                            type: 'danger',
+                                            onConfirm: () => {
+                                                setSubcategories(defaultIngredientSubcategories)
+                                                setConfirmModal(null)
+                                                showToast('Subcategorias restauradas', 'success')
+                                            },
+                                            onCancel: () => setConfirmModal(null)
+                                        })
                                     }}
                                     className="w-full py-3 text-zinc-500 dark:text-zinc-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:text-zinc-700 dark:hover:text-zinc-300 transition-all"
                                 >
