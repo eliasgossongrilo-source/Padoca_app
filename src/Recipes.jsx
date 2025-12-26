@@ -400,7 +400,13 @@ const IngredientItem = React.memo(({ item, onUpdate, onDelete, onNext, isEditing
                                     type="text"
                                     inputMode="decimal"
                                     value={item.quantity}
-                                    onChange={e => onUpdate({ ...item, quantity: e.target.value })}
+                                    onChange={e => {
+                                        const value = e.target.value
+                                        // Allow only numbers, comma, and dot
+                                        if (value === '' || /^[0-9.,]*$/.test(value)) {
+                                            onUpdate({ ...item, quantity: value })
+                                        }
+                                    }}
                                     onKeyDown={e => {
                                         if (e.key === 'Enter') {
                                             e.preventDefault()
