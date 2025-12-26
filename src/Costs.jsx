@@ -618,156 +618,172 @@ export default function Costs() {
             </section>
 
             {/* Modal: Ultra-Compact Apple Pro Interface */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-                    {/* Minimal Backdrop */}
-                    <div
-                        className="absolute inset-0 bg-black/30 dark:bg-black/80 backdrop-blur-sm transition-opacity animate-fade-in"
-                        onClick={closeModal}
-                    ></div>
+            <AnimatePresence>
+                {isModalOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4"
+                    >
+                        {/* Minimal Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/30 dark:bg-black/80 backdrop-blur-sm"
+                            onClick={closeModal}
+                        />
 
-                    {/* Compact Modal Content - List Based */}
-                    <div className="relative bg-zinc-100 dark:bg-zinc-900 w-full max-w-sm rounded-t-[2.5rem] md:rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border-t border-white/20 dark:border-white/5 flex flex-col animate-slide-up overflow-hidden max-h-[85vh] md:max-h-[80vh]">
+                        {/* Compact Modal Content - List Based */}
+                        <motion.div
+                            initial={{ y: "100%", opacity: 0.5 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: "100%", opacity: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="relative bg-zinc-100 dark:bg-zinc-900 w-full max-w-sm rounded-t-[2.5rem] md:rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border-t border-white/20 dark:border-white/5 flex flex-col overflow-hidden max-h-[85vh] md:max-h-[80vh]"
+                        >
 
-                        {/* Minimal Drag Handle */}
-                        <div className="md:hidden w-full flex justify-center pt-4 pb-1 shrink-0">
-                            <div className="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-800"></div>
-                        </div>
+                            {/* Minimal Drag Handle */}
+                            <div className="md:hidden w-full flex justify-center pt-4 pb-1 shrink-0">
+                                <div className="w-8 h-1 rounded-full bg-zinc-300 dark:bg-zinc-800"></div>
+                            </div>
 
-                        {/* Compact Header */}
-                        <div className="px-6 py-4 flex justify-between items-center shrink-0">
-                            <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
-                                {editingId ? 'Editar Despesa' : 'Nova Despesa'}
-                            </h3>
-                            <button
-                                onClick={closeModal}
-                                className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all active:scale-90"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
-                        </div>
+                            {/* Compact Header */}
+                            <div className="px-6 py-4 flex justify-between items-center shrink-0">
+                                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
+                                    {editingId ? 'Editar Despesa' : 'Nova Despesa'}
+                                </h3>
+                                <button
+                                    onClick={closeModal}
+                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all active:scale-90"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
 
-                        <div className="overflow-y-auto custom-scrollbar flex-1 pb-10">
-                            {isCategoryManagerOpen ? (
-                                <div className="space-y-4 px-4 animate-fade-in">
-                                    <div className="bg-white dark:bg-zinc-800/50 rounded-2xl border border-zinc-200 dark:border-white/5 overflow-hidden">
-                                        {categories.map((cat, idx) => (
-                                            <div key={cat} className={`flex justify-between items-center py-3 px-4 ${idx !== categories.length - 1 ? 'border-b border-zinc-100 dark:border-white/5' : ''}`}>
-                                                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{cat}</span>
-                                                <button onClick={() => removeCategory(cat)} className="text-red-400 p-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                </button>
-                                            </div>
-                                        ))}
+                            <div className="overflow-y-auto custom-scrollbar flex-1 pb-10">
+                                {isCategoryManagerOpen ? (
+                                    <div className="space-y-4 px-4 animate-fade-in">
+                                        <div className="bg-white dark:bg-zinc-800/50 rounded-2xl border border-zinc-200 dark:border-white/5 overflow-hidden">
+                                            {categories.map((cat, idx) => (
+                                                <div key={cat} className={`flex justify-between items-center py-3 px-4 ${idx !== categories.length - 1 ? 'border-b border-zinc-100 dark:border-white/5' : ''}`}>
+                                                    <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{cat}</span>
+                                                    <button onClick={() => removeCategory(cat)} className="text-red-400 p-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <input
+                                                className="flex-1 bg-white dark:bg-zinc-800/50 border-none rounded-xl px-4 py-3 text-sm font-medium outline-none placeholder:text-zinc-400 dark:text-white"
+                                                placeholder="Nova categoria..."
+                                                value={newCatName}
+                                                onChange={e => setNewCatName(e.target.value)}
+                                            />
+                                            <button className="w-12 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-xl text-xl font-bold" onClick={addCategory}>+</button>
+                                        </div>
+                                        <button onClick={() => setIsCategoryManagerOpen(false)} className="w-full py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-widest transition-all">Pronto</button>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <input
-                                            className="flex-1 bg-white dark:bg-zinc-800/50 border-none rounded-xl px-4 py-3 text-sm font-medium outline-none placeholder:text-zinc-400 dark:text-white"
-                                            placeholder="Nova categoria..."
-                                            value={newCatName}
-                                            onChange={e => setNewCatName(e.target.value)}
-                                        />
-                                        <button className="w-12 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-xl text-xl font-bold" onClick={addCategory}>+</button>
-                                    </div>
-                                    <button onClick={() => setIsCategoryManagerOpen(false)} className="w-full py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-widest transition-all">Pronto</button>
-                                </div>
-                            ) : (
-                                <form onSubmit={handleSave} className="space-y-6 px-4 animate-fade-in">
-                                    {/* System Style List Group */}
-                                    <div className="bg-white dark:bg-zinc-800/50 rounded-2xl border border-zinc-200 dark:border-white/5 overflow-hidden">
-                                        <div className="flex items-center px-4 py-3 border-b border-zinc-100 dark:border-white/5">
-                                            <label className="w-24 text-[10px] font-bold text-zinc-400 uppercase tracking-widest shrink-0">Nome</label>
-                                            <input
-                                                className="flex-1 bg-transparent border-none py-1 text-sm font-semibold text-zinc-800 dark:text-white outline-none placeholder:text-zinc-300"
-                                                autoFocus value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="Mixer, Aluguel..."
-                                            />
-                                        </div>
-                                        <div className="flex items-center px-4 py-3 border-b border-zinc-100 dark:border-white/5">
-                                            <label className="w-24 text-[10px] font-bold text-zinc-400 uppercase tracking-widest shrink-0">Link</label>
-                                            <input
-                                                className="flex-1 bg-transparent border-none py-1 text-sm font-medium text-indigo-500/80 outline-none placeholder:text-zinc-300 italic"
-                                                type="url" value={formData.link} onChange={e => setFormData({ ...formData, link: e.target.value })} placeholder="Opcional..."
-                                            />
-                                        </div>
-                                        <div className="flex items-center px-4 py-3 border-b border-zinc-100 dark:border-white/5">
-                                            <label className="w-24 text-[10px] font-bold text-zinc-400 uppercase tracking-widest shrink-0">Quantidade</label>
-                                            <input
-                                                className="flex-1 bg-transparent border-none py-1 text-sm font-bold text-zinc-800 dark:text-white outline-none"
-                                                type="number" min="1" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="flex items-center px-4 py-3">
-                                            <label className="w-24 text-[10px] font-bold text-zinc-400 uppercase tracking-widest shrink-0">Preço Un.</label>
-                                            <div className="flex items-center flex-1">
-                                                <span className="text-[10px] font-bold text-indigo-500 mr-1">$</span>
+                                ) : (
+                                    <form onSubmit={handleSave} className="space-y-6 px-4 animate-fade-in">
+                                        {/* System Style List Group */}
+                                        <div className="bg-white dark:bg-zinc-800/50 rounded-2xl border border-zinc-200 dark:border-white/5 overflow-hidden">
+                                            <div className="flex items-center px-4 py-3 border-b border-zinc-100 dark:border-white/5">
+                                                <label className="w-24 text-[10px] font-bold text-zinc-400 uppercase tracking-widest shrink-0">Nome</label>
                                                 <input
-                                                    className="w-full bg-transparent border-none py-1 text-sm font-bold text-zinc-800 dark:text-white outline-none"
-                                                    type="number" step="0.01" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                                                    className="flex-1 bg-transparent border-none py-1 text-sm font-semibold text-zinc-800 dark:text-white outline-none placeholder:text-zinc-300"
+                                                    autoFocus value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="Mixer, Aluguel..."
                                                 />
                                             </div>
+                                            <div className="flex items-center px-4 py-3 border-b border-zinc-100 dark:border-white/5">
+                                                <label className="w-24 text-[10px] font-bold text-zinc-400 uppercase tracking-widest shrink-0">Link</label>
+                                                <input
+                                                    className="flex-1 bg-transparent border-none py-1 text-sm font-medium text-indigo-500/80 outline-none placeholder:text-zinc-300 italic"
+                                                    type="url" value={formData.link} onChange={e => setFormData({ ...formData, link: e.target.value })} placeholder="Opcional..."
+                                                />
+                                            </div>
+                                            <div className="flex items-center px-4 py-3 border-b border-zinc-100 dark:border-white/5">
+                                                <label className="w-24 text-[10px] font-bold text-zinc-400 uppercase tracking-widest shrink-0">Quantidade</label>
+                                                <input
+                                                    className="flex-1 bg-transparent border-none py-1 text-sm font-bold text-zinc-800 dark:text-white outline-none"
+                                                    type="number" min="1" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="flex items-center px-4 py-3">
+                                                <label className="w-24 text-[10px] font-bold text-zinc-400 uppercase tracking-widest shrink-0">Preço Un.</label>
+                                                <div className="flex items-center flex-1">
+                                                    <span className="text-[10px] font-bold text-indigo-500 mr-1">$</span>
+                                                    <input
+                                                        className="w-full bg-transparent border-none py-1 text-sm font-bold text-zinc-800 dark:text-white outline-none"
+                                                        type="number" step="0.01" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Segmented Control - Thinner */}
-                                    <div className="px-1">
-                                        <div className="p-1 bg-zinc-200 dark:bg-black/40 rounded-xl flex gap-1 relative shadow-inner">
-                                            {['Fixo', 'Variável'].map(type => (
-                                                <button
-                                                    key={type} type="button" onClick={() => setFormData({ ...formData, type })}
-                                                    className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${formData.type === type
-                                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm'
-                                                        : 'text-zinc-400'
-                                                        }`}
-                                                >
-                                                    {type}
-                                                </button>
-                                            ))}
+                                        {/* Segmented Control - Thinner */}
+                                        <div className="px-1">
+                                            <div className="p-1 bg-zinc-200 dark:bg-black/40 rounded-xl flex gap-1 relative shadow-inner">
+                                                {['Fixo', 'Variável'].map(type => (
+                                                    <button
+                                                        key={type} type="button" onClick={() => setFormData({ ...formData, type })}
+                                                        className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${formData.type === type
+                                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm'
+                                                            : 'text-zinc-400'
+                                                            }`}
+                                                    >
+                                                        {type}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Category Grid - Compact Tags */}
-                                    <div className="space-y-3 px-1">
-                                        <div className="flex justify-between items-center px-1">
-                                            <label className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Categoria</label>
-                                            <button type="button" onClick={() => setIsCategoryManagerOpen(true)} className="text-[9px] font-bold text-indigo-500 uppercase">Ajustar</button>
+                                        {/* Category Grid - Compact Tags */}
+                                        <div className="space-y-3 px-1">
+                                            <div className="flex justify-between items-center px-1">
+                                                <label className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Categoria</label>
+                                                <button type="button" onClick={() => setIsCategoryManagerOpen(true)} className="text-[9px] font-bold text-indigo-500 uppercase">Ajustar</button>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {categories.map(cat => (
+                                                    <button
+                                                        key={cat} type="button" onClick={() => setFormData({ ...formData, category: cat })}
+                                                        className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-tight transition-all border ${formData.category === cat
+                                                            ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-md'
+                                                            : 'bg-white dark:bg-zinc-800/50 text-zinc-400 border-zinc-200 dark:border-white/5'
+                                                            }`}
+                                                    >
+                                                        {cat}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {categories.map(cat => (
-                                                <button
-                                                    key={cat} type="button" onClick={() => setFormData({ ...formData, category: cat })}
-                                                    className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-tight transition-all border ${formData.category === cat
-                                                        ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-900 dark:border-white shadow-md'
-                                                        : 'bg-white dark:bg-zinc-800/50 text-zinc-400 border-zinc-200 dark:border-white/5'
-                                                        }`}
-                                                >
-                                                    {cat}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
 
-                                    {/* Footer Actions */}
-                                    <div className="flex flex-col gap-2 pt-2">
-                                        <button
-                                            type="submit"
-                                            className="w-full py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-2xl text-[11px] font-bold uppercase tracking-widest shadow-lg active:scale-95 transition-all"
-                                        >
-                                            Salvar Despesa
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={closeModal}
-                                            className="w-full py-2 text-[10px] font-bold text-zinc-400 uppercase tracking-widest"
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+                                        {/* Footer Actions */}
+                                        <div className="flex flex-col gap-2 pt-2">
+                                            <button
+                                                type="submit"
+                                                className="w-full py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-2xl text-[11px] font-bold uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+                                            >
+                                                Salvar Despesa
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={closeModal}
+                                                className="w-full py-2 text-[10px] font-bold text-zinc-400 uppercase tracking-widest"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Premium Toast */}
             <AnimatePresence>
@@ -791,39 +807,60 @@ export default function Costs() {
                 )}
             </AnimatePresence>
             {/* Premium Confirmation Modal */}
-            {confirmModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
-                        onClick={confirmModal.onCancel}
-                    />
-                    <div className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden animate-slide-up">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${confirmModal.type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </div>
-                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">{confirmModal.title}</h3>
-                        <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-6 leading-relaxed">
-                            {confirmModal.message}
-                        </p>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={confirmModal.onCancel}
-                                className="flex-1 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={confirmModal.onConfirm}
-                                className={`flex-1 py-3 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all ${confirmModal.type === 'danger' ? 'bg-rose-500 shadow-rose-500/20' : 'bg-zinc-900 dark:bg-white dark:text-zinc-900'}`}
-                            >
-                                Confirmar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Premium Confirmation Modal - Director Standard */}
+            <AnimatePresence>
+                {confirmModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+                    >
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+                            onClick={confirmModal.onCancel}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+                        >
+                            <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 mx-auto ${confirmModal.type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    {confirmModal.type === 'danger' ? (
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    ) : (
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    )}
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3 text-center tracking-tight">{confirmModal.title}</h3>
+                            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-8 leading-relaxed text-center font-medium">
+                                {confirmModal.message}
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={confirmModal.onCancel}
+                                    className="flex-1 py-3.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={confirmModal.onConfirm}
+                                    className={`flex-1 py-3.5 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg active:scale-95 transition-all ${confirmModal.type === 'danger' ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/25' : 'bg-zinc-900 dark:bg-white dark:text-zinc-900'}`}
+                                >
+                                    Confirmar
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { FirebaseService } from './services/firebaseService'
 import { motion, AnimatePresence, Reorder, useMotionValue } from 'framer-motion'
 
@@ -71,6 +72,15 @@ export default function Kanban() {
     const [renameTitle, setRenameTitle] = useState('')
     const [confirmModal, setConfirmModal] = useState(null)
     const [isCloudSynced, setIsCloudSynced] = useState(false)
+
+    // Premium Toast System
+    const [toastMessage, setToastMessage] = useState(null)
+    const toastTimeoutRef = useRef(null)
+    const showToast = useCallback((message, type = 'success') => {
+        if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current)
+        setToastMessage({ message, type })
+        toastTimeoutRef.current = setTimeout(() => setToastMessage(null), 3500)
+    }, [])
 
     // ═══════════════════════════════════════════════════════════════
     // DRAG & DROP ENGINE
@@ -482,6 +492,28 @@ export default function Kanban() {
             <AnimatePresence>
                 {confirmModal && <ConfirmationModal {...confirmModal} />}
             </AnimatePresence>
+
+            {/* Premium Toast */}
+            <AnimatePresence>
+                {toastMessage && createPortal(
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                        className={`fixed top-6 left-1/2 -translate-x-1/2 z-[20000] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-xl border ${toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400/20 text-white' :
+                            toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400/20 text-white' :
+                                'bg-zinc-900/90 border-white/10 text-white'
+                            }`}
+                    >
+                        <div className={`w-2 h-2 rounded-full ${toastMessage.type === 'error' ? 'bg-white animate-pulse' :
+                            toastMessage.type === 'success' ? 'bg-white' :
+                                'bg-indigo-400'
+                            }`} />
+                        <span className="text-sm font-semibold tracking-tight">{toastMessage.message}</span>
+                    </motion.div>,
+                    document.body
+                )}
+            </AnimatePresence>
         </div>
     )
 }
@@ -707,13 +739,24 @@ const DragGhost = React.memo(({ dragState, ghostX, ghostY, spring }) => {
 
 function ConfirmationModal({ title, message, type = 'info', onConfirm, onCancel }) {
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] flex items-center justify-center p-6">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} transition={{ type: "spring", stiffness: 400, damping: 30 }} className="relative bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl max-w-sm w-full border border-zinc-200/50 dark:border-white/10">
-                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">{title}</h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-8 leading-relaxed">{message}</p>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} transition={{ type: "spring", stiffness: 400, damping: 30 }} className="relative bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl max-w-sm w-full border border-zinc-200/50 dark:border-white/10 overflow-hidden">
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 mx-auto ${type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'}`}>
+                    {type === 'danger' ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    )}
+                </div>
+                <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3 text-center tracking-tight">{title}</h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-8 leading-relaxed text-center font-medium">{message}</p>
                 <div className="flex gap-3">
-                    <button onClick={onCancel} className="flex-1 py-3.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">Cancelar</button>
+                    <button onClick={onCancel} className="flex-1 py-3.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">Cancelar</button>
                     <button onClick={onConfirm} className={`flex-1 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white shadow-lg active:scale-95 transition-all ${type === 'danger' ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/25' : 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'}`}>Confirmar</button>
                 </div>
             </motion.div>
