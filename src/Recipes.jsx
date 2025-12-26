@@ -5,6 +5,7 @@ import { Reorder, motion, AnimatePresence, useDragControls } from 'framer-motion
 import { compressImage } from './services/imageUtils'
 import Cropper from 'react-easy-crop'
 import getCroppedImg from './utils/cropUtils'
+import { useScrollLock } from './hooks/useScrollLock'
 
 /**
  * Recipes - Ultra-Premium Editorial Design v2.0
@@ -60,47 +61,47 @@ const Icons = {
     Clock: () => <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
     Bars: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" /></svg>,
     Book: () => <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>,
-    Check: () => <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+    Check: () => <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>,
+    Minus: (props) => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
 }
 
 // --- SUB-COMPONENTS ---
 
-const ImageLightbox = ({ src, onClose }) => createPortal(
-    <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-3xl flex items-center justify-center p-4"
-    >
-        <button
+const ImageLightbox = ({ src, onClose }) => {
+    useScrollLock(true)
+    return createPortal(
+        <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute top-8 right-8 z-50 p-4 rounded-full bg-white/5 text-white/50 hover:bg-white/10 hover:text-white transition-all backdrop-blur-md border border-white/5 hover:border-white/20 active:scale-95 group"
+            className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-3xl flex items-center justify-center p-4"
         >
-            <Icons.Close className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
-        </button>
-        <motion.img
-            src={src}
-            className="max-w-full max-h-full object-contain shadow-2xl rounded-2xl"
-            draggable={false}
-            onClick={(e) => e.stopPropagation()}
-            transition={{ type: "spring", stiffness: 250, damping: 35 }}
-        />
-    </motion.div>,
-    document.body
-)
+            <button
+                onClick={onClose}
+                className="absolute top-8 right-8 z-50 p-4 rounded-full bg-white/5 text-white/50 hover:bg-white/10 hover:text-white transition-all backdrop-blur-md border border-white/5 hover:border-white/20 active:scale-95 group"
+            >
+                <Icons.Close className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+            </button>
+            <motion.img
+                src={src}
+                className="max-w-full max-h-full object-contain shadow-2xl rounded-2xl"
+                draggable={false}
+                onClick={(e) => e.stopPropagation()}
+                transition={{ type: "spring", stiffness: 250, damping: 35 }}
+            />
+        </motion.div>,
+        document.body
+    )
+}
 
-// --- IMAGE CROPPER MODAL (Director Class) ---
+// --- IMAGE CROPPER MODAL (Director Class Edition) ---
 const ImageCropperModal = ({ imageSrc, onCancel, onCropComplete }) => {
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+    const [isInteracting, setIsInteracting] = useState(false)
 
-    const onCropChange = (crop) => {
-        setCrop(crop)
-    }
-
-    const onZoomChange = (zoom) => {
-        setZoom(zoom)
-    }
+    // Lock scroll when modal is open
+    useScrollLock(true)
 
     const onCropCompleteInternal = (croppedArea, croppedAreaPixels) => {
         setCroppedAreaPixels(croppedAreaPixels)
@@ -117,62 +118,99 @@ const ImageCropperModal = ({ imageSrc, onCancel, onCropComplete }) => {
 
     return createPortal(
         <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[11000] bg-black flex flex-col pt-safe-top"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[20000] bg-black flex flex-col"
         >
-            <div className="relative flex-1 bg-black overflow-hidden">
+            {/* 1. Floating Premium Header */}
+            <div className="absolute top-0 left-0 right-0 z-[20001] px-6 py-12 flex justify-between items-center bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none">
+                <button
+                    onClick={onCancel}
+                    className="pointer-events-auto px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/10 text-white text-sm font-semibold transition-all active:scale-95"
+                >
+                    Cancelar
+                </button>
+                <h3 className="text-white text-sm font-bold uppercase tracking-widest opacity-80 mt-1">
+                    Redimensionar
+                </h3>
+                <button
+                    onClick={handleSave}
+                    className="pointer-events-auto px-6 py-2.5 rounded-full bg-white text-black text-sm font-bold transition-all hover:bg-zinc-100 active:scale-95 shadow-[0_4px_24px_rgba(255,255,255,0.2)]"
+                >
+                    OK
+                </button>
+            </div>
+
+            {/* 2. Main Cropper Area */}
+            <div className="relative flex-1 bg-black">
                 <Cropper
                     image={imageSrc}
                     crop={crop}
                     zoom={zoom}
                     aspect={4 / 5}
-                    onCropChange={onCropChange}
-                    onZoomChange={onZoomChange}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
                     onCropComplete={onCropCompleteInternal}
-                    showGrid={true}
+                    showGrid={isInteracting}
+                    onInteractionStart={() => setIsInteracting(true)}
+                    onInteractionEnd={() => setIsInteracting(false)}
                     classes={{
                         containerClassName: 'bg-black',
                         mediaClassName: 'object-contain',
-                        cropAreaClassName: 'border-2 border-white/80'
+                        cropAreaClassName: 'border border-white/40 shadow-[0_0_0_1000px_rgba(0,0,0,0.7)]'
                     }}
                 />
             </div>
 
-            <div className="bg-zinc-900 border-t border-white/10 p-6 safe-pb pb-8">
-                <div className="flex items-center gap-4 mb-6">
-                    <Icons.Camera className="w-5 h-5 text-zinc-400" />
+            {/* 3. Floating Premium Footer */}
+            <div className="absolute bottom-0 left-0 right-0 z-[20001] px-8 py-16 flex flex-col items-center bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none">
+                {/* Zoom Control Slider */}
+                <div className="w-full max-w-xs flex items-center gap-6 pointer-events-auto">
+                    <button
+                        onClick={() => setZoom(Math.max(1, zoom - 0.1))}
+                        className="p-1 text-white/50 hover:text-white transition-colors"
+                    >
+                        <Icons.Camera className="w-4 h-4" />
+                    </button>
+
                     <input
                         type="range"
                         value={zoom}
                         min={1}
                         max={3}
-                        step={0.1}
-                        aria-labelledby="Zoom"
-                        onChange={(e) => setZoom(e.target.value)}
-                        className="w-full accent-white h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
+                        step={0.01}
+                        onChange={(e) => setZoom(parseFloat(e.target.value))}
+                        className="range-slider accent-white"
                     />
-                    <Icons.Plus className="w-5 h-5 text-zinc-400" />
+
+                    <button
+                        onClick={() => setZoom(Math.min(3, zoom + 0.1))}
+                        className="p-1 text-white/50 hover:text-white transition-colors"
+                    >
+                        <Icons.Plus className="w-4 h-4" />
+                    </button>
                 </div>
 
-                <div className="flex gap-4">
-                    <button
-                        onClick={onCancel}
-                        className="flex-1 py-4 rounded-xl bg-zinc-800 text-white font-bold text-sm uppercase tracking-widest hover:bg-zinc-700 transition-colors"
-                    >
-                        Cancelar
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        className="flex-1 py-4 rounded-xl bg-white text-black font-bold text-sm uppercase tracking-widest hover:bg-zinc-200 transition-colors"
-                    >
-                        Cortar & Salvar
-                    </button>
+                {/* Visual Feedback Line */}
+                <div className="mt-8 flex gap-1 items-center opacity-30 select-none">
+                    {[1, 1.5, 2, 2.5, 3].map(val => (
+                        <div
+                            key={val}
+                            className={`w-1 h-3 rounded-full transition-all duration-300 ${zoom >= val ? 'bg-white h-5 opacity-100' : 'bg-white/40'}`}
+                        />
+                    ))}
                 </div>
             </div>
+
+            {/* iOS Style Home Indicator Placeholder for aesthetics */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-white/20 rounded-full z-[20002]" />
         </motion.div>,
         document.body
     )
 }
+
+
 
 const SectionWrapper = ({ id, children }) => {
     const controls = useDragControls()
@@ -1387,6 +1425,7 @@ export default function Recipes() {
                             />
 
                             {/* Modal Content */}
+                            {/* Modal Content */}
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -1394,6 +1433,7 @@ export default function Recipes() {
                                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden"
                             >
+                                <ConfirmModalScrollLock />
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${confirmModal.type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'}`}>
                                     <Icons.Trash />
                                 </div>
@@ -1439,7 +1479,10 @@ export default function Recipes() {
     )
 }
 
-
+function ConfirmModalScrollLock() {
+    useScrollLock(true)
+    return null
+}
 
 function RecipeSection({ section, onUpdate, onDelete, dragControls, isEditing }) {
     if (section.type === 'ingredients') {
