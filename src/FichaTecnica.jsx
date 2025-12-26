@@ -285,8 +285,10 @@ export default function FichaTecnica() {
     }
 
     // Add ingredient to selected pizza
-    const handleAddIngredient = () => {
-        if (!selectedPizza || !newIngredient.name.trim()) return
+    // keepOpen: if true, form stays open for adding more ingredients
+    const handleAddIngredient = (keepOpen = false) => {
+        // Validation: require both name and quantity
+        if (!selectedPizza || !newIngredient.name.trim() || !newIngredient.quantity) return
 
         const ingredient = {
             id: Date.now(),
@@ -305,7 +307,15 @@ export default function FichaTecnica() {
 
         setNewIngredient({ name: '', quantity: '', unit: 'g', pricePerUnit: '', isSyncedFromInventory: false, inventoryItemId: null })
         setMatchedInventoryItem(null)
-        setIsAddingIngredient(false)
+
+        if (keepOpen) {
+            // Focus back on name input after a short delay
+            setTimeout(() => {
+                document.getElementById('cat-ing-name-input')?.focus()
+            }, 50)
+        } else {
+            setIsAddingIngredient(false)
+        }
     }
 
     // Update ingredient
@@ -817,7 +827,8 @@ export default function FichaTecnica() {
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
                                                     e.preventDefault()
-                                                    handleAddIngredient()
+                                                    // Add ingredient and keep form open for next one
+                                                    handleAddIngredient(true)
                                                 }
                                             }}
                                             step="any"

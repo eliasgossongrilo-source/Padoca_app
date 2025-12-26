@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import UnitToggle from './UnitToggle.jsx'
 import Costs from './Costs.jsx'
 import FichaTecnica from './FichaTecnica.jsx'
@@ -8,100 +9,251 @@ import Recipes from './Recipes.jsx'
 import Kanban from './Kanban.jsx'
 
 /**
- * App - Main application component
- * Premium navigation shell for all modules
+ * App - Premium Navigation Shell
+ * Apple-quality navigation with refined micro-interactions
  */
+
+// Navigation items configuration
+const NAV_ITEMS = [
+  { key: 'kanban', label: 'Kanban', icon: KanbanIcon },
+  { key: 'recipes', label: 'Receitas', icon: RecipesIcon },
+  { key: 'inventory', label: 'Estoque', icon: InventoryIcon },
+  { key: 'costs', label: 'Financeiro', icon: CostsIcon },
+  { key: 'ficha', label: 'Ficha', icon: FichaIcon },
+  { key: 'calculator', label: 'Produção', icon: ProductionIcon }
+]
+
+// Premium Icon Components
+function KanbanIcon({ active }) {
+  return (
+    <svg className={`w-4 h-4 transition-all ${active ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+    </svg>
+  )
+}
+
+function RecipesIcon({ active }) {
+  return (
+    <svg className={`w-4 h-4 transition-all ${active ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    </svg>
+  )
+}
+
+function InventoryIcon({ active }) {
+  return (
+    <svg className={`w-4 h-4 transition-all ${active ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    </svg>
+  )
+}
+
+function CostsIcon({ active }) {
+  return (
+    <svg className={`w-4 h-4 transition-all ${active ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  )
+}
+
+function FichaIcon({ active }) {
+  return (
+    <svg className={`w-4 h-4 transition-all ${active ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+    </svg>
+  )
+}
+
+function ProductionIcon({ active }) {
+  return (
+    <svg className={`w-4 h-4 transition-all ${active ? 'scale-110' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+    </svg>
+  )
+}
+
+// Spring animation configuration
+const spring = {
+  type: "spring",
+  stiffness: 500,
+  damping: 35,
+  mass: 0.8
+}
+
+// Page transition variants
+const pageVariants = {
+  initial: { opacity: 0, y: 8, scale: 0.99 },
+  enter: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -4, scale: 0.99 }
+}
+
 export default function App() {
-  const [inputMode, setInputMode] = useState('pct') // 'pct' or 'grams'
+  const [inputMode, setInputMode] = useState('pct')
   const [view, setView] = useState(() => {
-    // Persist view selection in localStorage
     const saved = localStorage.getItem('padoca_view')
     return saved || 'recipes'
   })
+  const [isLoaded, setIsLoaded] = useState(false)
 
-  // Save view to localStorage when it changes
+  // Smooth initial load
+  useEffect(() => {
+    setIsLoaded(true)
+  }, [])
+
   const handleViewChange = (newView) => {
+    if (newView === view) return
     setView(newView)
     localStorage.setItem('padoca_view', newView)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-100 text-zinc-900 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 dark:text-zinc-100">
-      {/* Main Container */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-8">
-        {/* Header - Sticky on Desktop */}
-        <header className="sticky top-0 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-4 pb-4 mb-6 md:relative md:pt-6">
-          {/* Glass Background for Sticky Header */}
-          <div className="absolute inset-0 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl md:bg-transparent md:backdrop-blur-none" />
+    <div className={`min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-100 text-zinc-900 dark:from-black dark:via-zinc-950 dark:to-black dark:text-zinc-100 transition-colors duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
 
-          <div className="relative flex flex-col gap-4">
+      {/* Ambient Background Effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden select-none">
+        {/* Primary gradient orb */}
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-gradient-to-br from-indigo-500/[0.03] via-purple-500/[0.02] to-transparent blur-[100px] rounded-full" />
+        {/* Secondary gradient orb */}
+        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-gradient-to-tl from-violet-500/[0.03] via-rose-500/[0.02] to-transparent blur-[100px] rounded-full" />
+        {/* Subtle noise texture overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjAzIiBkPSJNMCAwaDMwMHYzMDBIMHoiLz48L3N2Zz4=')] opacity-50 dark:opacity-30" />
+      </div>
+
+      {/* Main Container */}
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 pb-8">
+
+        {/* Premium Header */}
+        <header className="sticky top-0 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-4 pb-4 mb-6 md:relative md:pt-8 md:mb-8">
+
+          {/* Glass Background */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 bg-white/70 dark:bg-black/70 backdrop-blur-2xl md:bg-transparent md:backdrop-blur-none border-b border-zinc-200/50 dark:border-white/5 md:border-none"
+          />
+
+          <div className="relative flex flex-col gap-5">
+
             {/* Title Row */}
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1, ...spring }}
+              >
+                <h1 className="text-2xl md:text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
                   Padoca Pizza
                 </h1>
-                <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium mt-0.5 hidden md:block">
-                  Sistema de produção e gestão
+                <p className="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium mt-1 tracking-wide uppercase hidden md:block">
+                  Sistema de Produção & Gestão
                 </p>
-              </div>
+              </motion.div>
 
-              {/* Unit Toggle - Desktop only in header */}
-              <div className="hidden md:flex items-center gap-3">
-                {view === 'calculator' && (
-                  <UnitToggle value={inputMode} onChange={setInputMode} />
-                )}
-              </div>
+              {/* Unit Toggle - Desktop */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2, ...spring }}
+                className="hidden md:flex items-center gap-3"
+              >
+                <AnimatePresence mode="wait">
+                  {view === 'calculator' && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={spring}
+                    >
+                      <UnitToggle value={inputMode} onChange={setInputMode} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
 
-            {/* Navigation Pills */}
+            {/* Navigation Pills - Premium */}
             <nav className="flex items-center gap-2">
-              <div className="flex-1 flex items-center gap-1 p-1 bg-zinc-100/90 dark:bg-zinc-800/90 rounded-2xl overflow-x-auto scrollbar-hidden">
-                {[
-                  { key: 'kanban', label: 'Kanban' },
-                  { key: 'recipes', label: 'Receitas' },
-                  { key: 'inventory', label: 'Estoque' },
-                  { key: 'costs', label: 'Financeiro' },
-                  { key: 'ficha', label: 'Ficha' },
-                  { key: 'calculator', label: 'Produção' }
-                ].map(({ key, label }) => (
-                  <button
-                    key={key}
-                    onClick={() => handleViewChange(key)}
-                    className={`flex-1 md:flex-none px-4 md:px-5 py-2.5 text-[11px] md:text-xs font-semibold rounded-xl transition-all duration-200 whitespace-nowrap min-w-[70px] ${view === key
-                      ? 'bg-white dark:bg-zinc-700 shadow-md text-zinc-900 dark:text-white'
-                      : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-                      }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, ...spring }}
+                className="flex-1 flex items-center gap-1 p-1.5 bg-zinc-100/90 dark:bg-zinc-900/90 backdrop-blur-xl rounded-2xl overflow-x-auto scrollbar-hidden border border-zinc-200/50 dark:border-white/5 shadow-sm"
+              >
+                {NAV_ITEMS.map(({ key, label, icon: Icon }) => {
+                  const isActive = view === key
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => handleViewChange(key)}
+                      className={`relative flex-1 md:flex-none flex items-center justify-center gap-2 px-4 md:px-5 py-3 text-[10px] md:text-[11px] font-semibold rounded-xl transition-all duration-200 whitespace-nowrap min-w-[60px] ${isActive
+                          ? 'text-zinc-900 dark:text-white'
+                          : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
+                        }`}
+                    >
+                      {/* Active Background */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="nav-active"
+                          className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-xl shadow-lg shadow-zinc-900/5 dark:shadow-black/20"
+                          transition={spring}
+                        />
+                      )}
 
-              {/* Unit Toggle - Mobile only next to nav */}
-              <div className="md:hidden flex-shrink-0">
+                      {/* Icon + Label */}
+                      <span className="relative z-10 hidden md:block">
+                        <Icon active={isActive} />
+                      </span>
+                      <span className="relative z-10 uppercase tracking-wider">{label}</span>
+                    </button>
+                  )
+                })}
+              </motion.div>
+
+              {/* Unit Toggle - Mobile */}
+              <AnimatePresence mode="wait">
                 {view === 'calculator' && (
-                  <UnitToggle value={inputMode} onChange={setInputMode} />
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, width: 0 }}
+                    animate={{ opacity: 1, scale: 1, width: 'auto' }}
+                    exit={{ opacity: 0, scale: 0.8, width: 0 }}
+                    transition={spring}
+                    className="md:hidden flex-shrink-0"
+                  >
+                    <UnitToggle value={inputMode} onChange={setInputMode} />
+                  </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
             </nav>
           </div>
         </header>
 
-        {/* Content Area */}
-        {view === 'kanban' ? (
-          <Kanban />
-        ) : view === 'recipes' ? (
-          <Recipes />
-        ) : view === 'inventory' ? (
-          <Inventory />
-        ) : view === 'costs' ? (
-          <Costs />
-        ) : view === 'ficha' ? (
-          <FichaTecnica />
-        ) : (
-          <Production inputMode={inputMode} setInputMode={setInputMode} />
-        )}
+        {/* Content Area with Page Transitions */}
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={view}
+            initial="initial"
+            animate="enter"
+            exit="exit"
+            variants={pageVariants}
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            className="relative z-10"
+          >
+            {view === 'kanban' ? (
+              <Kanban />
+            ) : view === 'recipes' ? (
+              <Recipes />
+            ) : view === 'inventory' ? (
+              <Inventory />
+            ) : view === 'costs' ? (
+              <Costs />
+            ) : view === 'ficha' ? (
+              <FichaTecnica />
+            ) : (
+              <Production inputMode={inputMode} setInputMode={setInputMode} />
+            )}
+          </motion.main>
+        </AnimatePresence>
       </div>
     </div>
   )
