@@ -1302,6 +1302,17 @@ function RecipeSection({ section, onUpdate, onDelete, dragControls, isEditing })
 }
 
 function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing }) {
+    // Ensure there's always an empty row at the end when editing
+    React.useEffect(() => {
+        if (!isEditing) return
+        const items = section.items || []
+        const lastItem = items[items.length - 1]
+        // Add empty row if last row has content
+        if (!lastItem || (lastItem.name.trim() || lastItem.quantity.trim())) {
+            onUpdate({ ...section, items: [...items, { id: Date.now(), name: '', quantity: '', unit: 'g' }] })
+        }
+    }, [section.items, isEditing])
+
     return (
         <div className="relative group/section bg-white dark:bg-black rounded-3xl p-4 md:p-6 border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
             <div className="flex items-center justify-between mb-6 pl-1">
@@ -1360,18 +1371,15 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
                 <button
                     type="button"
                     onClick={() => {
+                        // Focus the last (empty) row that already exists
                         const lastItem = section.items[section.items.length - 1]
-                        if (lastItem && !lastItem.name.trim()) return
-                        const newId = Date.now()
-                        const newItem = { id: newId, name: '', quantity: '', unit: 'g' }
-                        onUpdate({ ...section, items: [...section.items, newItem] })
-                        // Scroll to new field so user can tap it
-                        requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                                const field = document.getElementById(`ing-name-${newId}`)
-                                field?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                            })
-                        })
+                        if (lastItem) {
+                            const field = document.getElementById(`ing-name-${lastItem.id}`)
+                            if (field) {
+                                field.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                field.focus()
+                            }
+                        }
                     }}
                     className="mt-6 w-full py-4 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-300 transition-all flex items-center justify-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 active:scale-[0.98] touch-manipulation cursor-pointer select-none"
                 >
@@ -1383,6 +1391,17 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
 }
 
 function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditing }) {
+    // Ensure there's always an empty row at the end when editing
+    React.useEffect(() => {
+        if (!isEditing) return
+        const items = section.items || []
+        const lastItem = items[items.length - 1]
+        // Add empty row if last row has content
+        if (!lastItem || lastItem.text.trim()) {
+            onUpdate({ ...section, items: [...items, { id: Date.now(), text: '' }] })
+        }
+    }, [section.items, isEditing])
+
     return (
         <div className="relative group/section bg-white dark:bg-black rounded-3xl p-4 md:p-6 border border-zinc-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
             <div className="flex items-center justify-between mb-6 pl-1">
@@ -1395,16 +1414,16 @@ function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditin
                     </div>
 
                     {/* Badge for Type */}
-                    <div className="w-6 h-6 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center text-[10px] font-bold shrink-0">
-                        PR
+                    <div className="w-6 h-6 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center text-[10px] font-bold shrink-0">
+                        MP
                     </div>
 
                     {isEditing ? (
                         <input
                             value={section.title}
                             onChange={e => onUpdate({ ...section, title: e.target.value })}
-                            className="font-bold text-sm text-zinc-900 dark:text-white uppercase tracking-wider bg-transparent outline-none hover:text-amber-500 transition-colors flex-1 placeholder:text-zinc-300"
-                            placeholder="TÍTULO DA SEÇÃO"
+                            className="font-bold text-sm text-zinc-900 dark:text-white uppercase tracking-wider bg-transparent outline-none hover:text-indigo-500 transition-colors flex-1 placeholder:text-zinc-300"
+                            placeholder="NOME DA SEÇÃO"
                         />
                     ) : (
                         <span className="font-bold text-sm text-zinc-900 dark:text-white uppercase tracking-wider flex-1">{section.title}</span>
@@ -1439,18 +1458,13 @@ function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditin
                 <button
                     type="button"
                     onClick={() => {
-                        const lastItem = section.items[section.items.length - 1]
-                        if (lastItem && !lastItem.text.trim()) return
-                        const newId = Date.now()
-                        onUpdate({ ...section, items: [...section.items, { id: newId, text: '' }] })
-                        // Scroll to new field so user can tap it
-                        requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                                const fields = document.querySelectorAll('textarea')
-                                const lastField = fields[fields.length - 1]
-                                lastField?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                            })
-                        })
+                        // Focus the last (empty) row that already exists
+                        const fields = document.querySelectorAll('textarea')
+                        const lastField = fields[fields.length - 1]
+                        if (lastField) {
+                            lastField.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                            lastField.focus()
+                        }
                     }}
                     className="mt-6 w-full py-4 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-300 transition-all flex items-center justify-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 active:scale-[0.98] touch-manipulation cursor-pointer select-none"
                 >
