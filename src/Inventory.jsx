@@ -57,8 +57,8 @@ export default function Inventory() {
             try {
                 const data = await FirebaseService.getInventory()
                 if (data) {
-                    if (data.items) setItems(data.items)
-                    if (data.categories) setCategories(data.categories)
+                    if (Array.isArray(data.items)) setItems(data.items)
+                    if (Array.isArray(data.categories)) setCategories(data.categories)
                 }
 
                 const settings = await FirebaseService.getGlobalSettings()
