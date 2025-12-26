@@ -80,11 +80,11 @@ const spring = {
   mass: 0.8
 }
 
-// Page transition variants
+// Page transition variants - Optimized for instant feel
 const pageVariants = {
-  initial: { opacity: 0, y: 8, scale: 0.99 },
+  initial: { opacity: 0, y: 12, scale: 0.98 },
   enter: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: -4, scale: 0.99 }
+  exit: { opacity: 0, y: -8, scale: 0.98 }
 }
 
 export default function App() {
@@ -102,10 +102,11 @@ export default function App() {
 
   const handleViewChange = (newView) => {
     if (newView === view) return
+    // Instant scroll-to-top BEFORE state change (no animation delay)
+    const root = document.getElementById('root')
+    if (root) root.scrollTop = 0
     setView(newView)
     localStorage.setItem('padoca_view', newView)
-    // Premium: Smooth scroll to top on navigation (luxury feel)
-    document.getElementById('root')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -230,15 +231,15 @@ export default function App() {
           </div>
         </header>
 
-        {/* Content Area with Page Transitions */}
-        <AnimatePresence mode="wait">
+        {/* Content Area with Premium Transitions */}
+        <AnimatePresence mode="popLayout">
           <motion.main
             key={view}
             initial="initial"
             animate="enter"
             exit="exit"
             variants={pageVariants}
-            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
             className="relative z-10"
           >
             {view === 'kanban' ? (
