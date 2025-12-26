@@ -1365,14 +1365,18 @@ function IngredientsTable({ section, onUpdate, onDelete, dragControls, isEditing
                         const newId = Date.now()
                         const newItem = { id: newId, name: '', quantity: '', unit: 'g' }
                         onUpdate({ ...section, items: [...section.items, newItem] })
+                        // Aggressive mobile keyboard trigger
+                        const tryFocus = () => {
+                            const field = document.getElementById(`ing-name-${newId}`)
+                            if (field) {
+                                field.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                field.focus({ preventScroll: false })
+                                field.click()
+                            }
+                        }
+                        tryFocus() // Immediate attempt
                         requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                                const field = document.getElementById(`ing-name-${newId}`)
-                                if (field) {
-                                    field.focus()
-                                    field.click()
-                                }
-                            })
+                            requestAnimationFrame(tryFocus) // Backup after DOM paint
                         })
                     }}
                     className="mt-6 w-full py-4 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-300 transition-all flex items-center justify-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 active:scale-[0.98] touch-manipulation cursor-pointer select-none"
@@ -1445,15 +1449,19 @@ function InstructionsTable({ section, onUpdate, onDelete, dragControls, isEditin
                         if (lastItem && !lastItem.text.trim()) return
                         const newId = Date.now()
                         onUpdate({ ...section, items: [...section.items, { id: newId, text: '' }] })
+                        // Aggressive mobile keyboard trigger
+                        const tryFocus = () => {
+                            const newFields = document.querySelectorAll('textarea')
+                            const lastField = newFields[newFields.length - 1]
+                            if (lastField) {
+                                lastField.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                lastField.focus({ preventScroll: false })
+                                lastField.click()
+                            }
+                        }
+                        tryFocus() // Immediate attempt
                         requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                                const newFields = document.querySelectorAll('textarea')
-                                const lastField = newFields[newFields.length - 1]
-                                if (lastField) {
-                                    lastField.focus()
-                                    lastField.click()
-                                }
-                            })
+                            requestAnimationFrame(tryFocus) // Backup after DOM paint
                         })
                     }}
                     className="mt-6 w-full py-4 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 dark:hover:text-zinc-300 transition-all flex items-center justify-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 active:scale-[0.98] touch-manipulation cursor-pointer select-none"
