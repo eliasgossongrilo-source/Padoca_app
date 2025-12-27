@@ -1159,236 +1159,249 @@ export default function Inventory() {
                 </div>
             </section>
 
-            {/* Category Management Modal */}
-            {isManagingCategories && (
-                <div className="fixed inset-0 z-50 flex items-stretch md:items-center justify-center md:p-4">
-                    <ModalScrollLock />
-                    {/* Backdrop */}
-                    <div
-                        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
-                        onClick={() => setIsManagingCategories(false)}
-                    ></div>
-
-                    {/* Modal Content - Full screen on mobile with safe areas */}
-                    <div
-                        className="relative w-full h-full md:h-auto md:max-w-lg bg-white dark:bg-zinc-900 md:rounded-[2rem] shadow-2xl md:max-h-[85vh] overflow-hidden flex flex-col"
-                        style={{
-                            paddingTop: 'env(safe-area-inset-top)',
-                            paddingBottom: 'env(safe-area-inset-bottom)',
-                            paddingLeft: 'env(safe-area-inset-left)',
-                            paddingRight: 'env(safe-area-inset-right)'
-                        }}
+            {/* Category Management Modal - Apple-Quality Bottom Sheet */}
+            <AnimatePresence>
+                {isManagingCategories && createPortal(
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4"
                     >
+                        <ModalScrollLock />
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+                            onClick={() => setIsManagingCategories(false)}
+                        />
 
-                        {/* Mobile Close Area - Tap anywhere at top */}
-                        <div className="md:hidden w-full flex flex-col items-center pt-3 pb-2 shrink-0 border-b border-zinc-100 dark:border-zinc-800" onClick={() => setIsManagingCategories(false)}>
-                            <div className="w-10 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700 mb-1"></div>
-                            <span className="text-[9px] font-medium text-zinc-400 uppercase tracking-wider">Arraste para fechar</span>
-                        </div>
+                        {/* Modal Content - Bottom sheet on mobile */}
+                        <motion.div
+                            initial={{ y: "100%", opacity: 0.5 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: "100%", opacity: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="relative w-full md:max-w-lg bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-[2rem] shadow-2xl max-h-[90dvh] md:max-h-[85vh] overflow-hidden flex flex-col"
+                            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+                        >
+                            {/* Mobile Drag Handle */}
+                            <div className="md:hidden w-full flex justify-center pt-3 pb-1 shrink-0">
+                                <div className="w-10 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                            </div>
 
-                        {/* Sticky Header */}
-                        <div className="flex items-center justify-between px-6 py-4 md:p-6 shrink-0 sticky top-0 bg-white dark:bg-zinc-900 z-10 border-b border-zinc-100 dark:border-zinc-800 md:border-none">
-                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Gerenciar Categorias</h3>
-                            <button
-                                onClick={() => setIsManagingCategories(false)}
-                                className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors active:scale-95"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        {/* Scrollable Content Area */}
-                        <div className="overflow-y-auto flex-1 px-6 pb-8 custom-scrollbar">
-                            {/* Categories List */}
-                            <div className="space-y-4 mb-6">
-                                <div className="space-y-2">
-                                    <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Categorias Principais</h4>
-                                    <div className="space-y-2">
-                                        {categories.map((cat, idx) => (
-                                            <div key={idx} className="flex items-center justify-between py-3 px-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30">
-                                                <span className="font-medium text-indigo-700 dark:text-indigo-300">{cat}</span>
-                                                <button
-                                                    onClick={() => {
-                                                        setConfirmModal({
-                                                            title: 'Excluir Categoria',
-                                                            message: `Excluir categoria "${cat}"? Itens desta categoria serão movidos para "Outros".`,
-                                                            type: 'danger',
-                                                            onConfirm: () => {
-                                                                setCategories(prev => prev.filter(c => c !== cat))
-                                                                setItems(prev => prev.map(item => item.category === cat ? { ...item, category: 'Outros' } : item))
-                                                                setConfirmModal(null)
-                                                                showToast('Categoria removida', 'success')
-                                                            },
-                                                            onCancel: () => setConfirmModal(null)
-                                                        })
-                                                    }}
-                                                    className="p-1.5 rounded-lg text-indigo-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
+                            {/* Sticky Header */}
+                            <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-zinc-100 dark:border-zinc-800">
+                                <div>
+                                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Gerenciar Categorias</h3>
+                                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-0.5">Organize seu inventário</p>
                                 </div>
-
-                                {/* Add New Category */}
-                                <div className="pt-4 border-t border-indigo-100 dark:border-indigo-800/30">
-                                    <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-3">Adicionar Nova Categoria</h4>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            className="flex-1 px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 text-zinc-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-indigo-400"
-                                            placeholder="Nome da categoria"
-                                            value={newCategoryName}
-                                            onChange={(e) => setNewCategoryName(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && newCategoryName.trim()) {
-                                                    if (!categories.includes(newCategoryName.trim())) {
-                                                        setCategories(prev => [...prev, newCategoryName.trim()])
-                                                        setNewCategoryName('')
-                                                    }
-                                                }
-                                            }}
-                                        />
-                                        <button
-                                            onClick={() => {
-                                                if (newCategoryName.trim() && !categories.includes(newCategoryName.trim())) {
-                                                    setCategories(prev => [...prev, newCategoryName.trim()])
-                                                    setNewCategoryName('')
-                                                }
-                                            }}
-                                            disabled={!newCategoryName.trim()}
-                                            className="px-5 py-3 bg-indigo-500 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Reset Categories */}
+                                {/* Close Button - 44px touch target */}
                                 <button
-                                    onClick={() => {
-                                        setConfirmModal({
-                                            title: 'Restaurar Categorias',
-                                            message: 'Deseja restaurar as categorias padrão? Categorias personalizadas serão mantidas se houverem itens nelas, mas a lista principal será resetada.',
-                                            type: 'default',
-                                            onConfirm: () => {
-                                                setCategories(defaultCategories)
-                                                setConfirmModal(null)
-                                                showToast('Categorias restauradas', 'success')
-                                            },
-                                            onCancel: () => setConfirmModal(null)
-                                        })
-                                    }}
-                                    className="w-full py-2 text-indigo-500 dark:text-indigo-400 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:text-indigo-700 dark:hover:text-indigo-300 transition-all"
+                                    onClick={() => setIsManagingCategories(false)}
+                                    className="w-11 h-11 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors active:scale-95"
+                                    aria-label="Fechar"
                                 >
-                                    Restaurar Categorias Padrão
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                    </svg>
                                 </button>
                             </div>
 
-                            {/* Subcategories List */}
-                            <div className="space-y-4 pt-6 border-t border-zinc-100 dark:border-zinc-700">
-                                <div className="space-y-2">
-                                    <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Subcategorias de Ingredientes</h4>
+                            {/* Scrollable Content Area */}
+                            <div className="overflow-y-auto flex-1 px-6 pb-8 custom-scrollbar">
+                                {/* Categories List */}
+                                <div className="space-y-4 mb-6">
                                     <div className="space-y-2">
-                                        {subcategories.map((sub, idx) => (
-                                            <div key={idx} className="flex items-center justify-between py-3 px-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-700">
-                                                <span className="font-medium text-zinc-700 dark:text-zinc-300">{sub}</span>
-                                                <button
-                                                    onClick={() => {
-                                                        setConfirmModal({
-                                                            title: 'Excluir Subcategoria',
-                                                            message: `Deseja excluir a subcategoria "${sub}"?`,
-                                                            type: 'danger',
-                                                            onConfirm: () => {
-                                                                setSubcategories(prev => prev.filter(s => s !== sub))
-                                                                setConfirmModal(null)
-                                                                showToast('Subcategoria removida', 'success')
-                                                            },
-                                                            onCancel: () => setConfirmModal(null)
-                                                        })
-                                                    }}
-                                                    className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        ))}
+                                        <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Categorias Principais</h4>
+                                        <div className="space-y-2">
+                                            {categories.map((cat, idx) => (
+                                                <div key={idx} className="flex items-center justify-between py-3 px-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30">
+                                                    <span className="font-medium text-indigo-700 dark:text-indigo-300">{cat}</span>
+                                                    <button
+                                                        onClick={() => {
+                                                            setConfirmModal({
+                                                                title: 'Excluir Categoria',
+                                                                message: `Excluir categoria "${cat}"? Itens desta categoria serão movidos para "Outros".`,
+                                                                type: 'danger',
+                                                                onConfirm: () => {
+                                                                    setCategories(prev => prev.filter(c => c !== cat))
+                                                                    setItems(prev => prev.map(item => item.category === cat ? { ...item, category: 'Outros' } : item))
+                                                                    setConfirmModal(null)
+                                                                    showToast('Categoria removida', 'success')
+                                                                },
+                                                                onCancel: () => setConfirmModal(null)
+                                                            })
+                                                        }}
+                                                        className="p-1.5 rounded-lg text-indigo-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
 
-                                {/* Add New Subcategory */}
-                                <div className="pt-4 border-t border-zinc-100 dark:border-zinc-700">
-                                    <h4 className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3">Adicionar Nova Subcategoria</h4>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            className="flex-1 px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all placeholder:text-zinc-400"
-                                            placeholder="Nome da subcategoria"
-                                            value={newSubcategoryName}
-                                            onChange={(e) => setNewSubcategoryName(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && newSubcategoryName.trim()) {
-                                                    if (!subcategories.includes(newSubcategoryName.trim())) {
-                                                        setSubcategories(prev => [...prev, newSubcategoryName.trim()])
-                                                        setNewSubcategoryName('')
+                                    {/* Add New Category */}
+                                    <div className="pt-4 border-t border-indigo-100 dark:border-indigo-800/30">
+                                        <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-3">Adicionar Nova Categoria</h4>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                className="flex-1 px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 text-zinc-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-indigo-400"
+                                                placeholder="Nome da categoria"
+                                                value={newCategoryName}
+                                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && newCategoryName.trim()) {
+                                                        if (!categories.includes(newCategoryName.trim())) {
+                                                            setCategories(prev => [...prev, newCategoryName.trim()])
+                                                            setNewCategoryName('')
+                                                        }
                                                     }
-                                                }
-                                            }}
-                                        />
-                                        <button
-                                            onClick={() => {
-                                                if (newSubcategoryName.trim() && !subcategories.includes(newSubcategoryName.trim())) {
-                                                    setSubcategories(prev => [...prev, newSubcategoryName.trim()])
-                                                    setNewSubcategoryName('')
-                                                }
-                                            }}
-                                            disabled={!newSubcategoryName.trim()}
-                                            className="px-5 py-3 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                                            </svg>
-                                        </button>
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    if (newCategoryName.trim() && !categories.includes(newCategoryName.trim())) {
+                                                        setCategories(prev => [...prev, newCategoryName.trim()])
+                                                        setNewCategoryName('')
+                                                    }
+                                                }}
+                                                disabled={!newCategoryName.trim()}
+                                                className="px-5 py-3 bg-indigo-500 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
 
-                                {/* Reset to Default */}
-                                <div className="pt-4">
+                                    {/* Reset Categories */}
                                     <button
                                         onClick={() => {
                                             setConfirmModal({
-                                                title: 'Restaurar Subcategorias',
-                                                message: 'Restaurar subcategorias padrão? Isso removerá todas as subcategorias personalizadas.',
-                                                type: 'danger',
+                                                title: 'Restaurar Categorias',
+                                                message: 'Deseja restaurar as categorias padrão? Categorias personalizadas serão mantidas se houverem itens nelas, mas a lista principal será resetada.',
+                                                type: 'default',
                                                 onConfirm: () => {
-                                                    setSubcategories(defaultIngredientSubcategories)
+                                                    setCategories(defaultCategories)
                                                     setConfirmModal(null)
-                                                    showToast('Subcategorias restauradas', 'success')
+                                                    showToast('Categorias restauradas', 'success')
                                                 },
                                                 onCancel: () => setConfirmModal(null)
                                             })
                                         }}
-                                        className="w-full py-3 text-zinc-500 dark:text-zinc-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:text-zinc-700 dark:hover:text-zinc-300 transition-all"
+                                        className="w-full py-2 text-indigo-500 dark:text-indigo-400 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:text-indigo-700 dark:hover:text-indigo-300 transition-all"
                                     >
-                                        Restaurar Padrões
+                                        Restaurar Categorias Padrão
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
 
-            {/* Premium Confirmation Modal - Director Standard */}
+                                {/* Subcategories List */}
+                                <div className="space-y-4 pt-6 border-t border-zinc-100 dark:border-zinc-700">
+                                    <div className="space-y-2">
+                                        <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Subcategorias de Ingredientes</h4>
+                                        <div className="space-y-2">
+                                            {subcategories.map((sub, idx) => (
+                                                <div key={idx} className="flex items-center justify-between py-3 px-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-700">
+                                                    <span className="font-medium text-zinc-700 dark:text-zinc-300">{sub}</span>
+                                                    <button
+                                                        onClick={() => {
+                                                            setConfirmModal({
+                                                                title: 'Excluir Subcategoria',
+                                                                message: `Deseja excluir a subcategoria "${sub}"?`,
+                                                                type: 'danger',
+                                                                onConfirm: () => {
+                                                                    setSubcategories(prev => prev.filter(s => s !== sub))
+                                                                    setConfirmModal(null)
+                                                                    showToast('Subcategoria removida', 'success')
+                                                                },
+                                                                onCancel: () => setConfirmModal(null)
+                                                            })
+                                                        }}
+                                                        className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Add New Subcategory */}
+                                    <div className="pt-4 border-t border-zinc-100 dark:border-zinc-700">
+                                        <h4 className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3">Adicionar Nova Subcategoria</h4>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                className="flex-1 px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all placeholder:text-zinc-400"
+                                                placeholder="Nome da subcategoria"
+                                                value={newSubcategoryName}
+                                                onChange={(e) => setNewSubcategoryName(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && newSubcategoryName.trim()) {
+                                                        if (!subcategories.includes(newSubcategoryName.trim())) {
+                                                            setSubcategories(prev => [...prev, newSubcategoryName.trim()])
+                                                            setNewSubcategoryName('')
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    if (newSubcategoryName.trim() && !subcategories.includes(newSubcategoryName.trim())) {
+                                                        setSubcategories(prev => [...prev, newSubcategoryName.trim()])
+                                                        setNewSubcategoryName('')
+                                                    }
+                                                }}
+                                                disabled={!newSubcategoryName.trim()}
+                                                className="px-5 py-3 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Reset to Default */}
+                                    <div className="pt-4">
+                                        <button
+                                            onClick={() => {
+                                                setConfirmModal({
+                                                    title: 'Restaurar Subcategorias',
+                                                    message: 'Restaurar subcategorias padrão? Isso removerá todas as subcategorias personalizadas.',
+                                                    type: 'danger',
+                                                    onConfirm: () => {
+                                                        setSubcategories(defaultIngredientSubcategories)
+                                                        setConfirmModal(null)
+                                                        showToast('Subcategorias restauradas', 'success')
+                                                    },
+                                                    onCancel: () => setConfirmModal(null)
+                                                })
+                                            }}
+                                            className="w-full py-3 text-zinc-500 dark:text-zinc-400 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:text-zinc-700 dark:hover:text-zinc-300 transition-all"
+                                        >
+                                            Restaurar Padrões
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>,
+                    document.body
+                )}
+            </AnimatePresence>
+
+            {/* Premium Confirmation Modal - Mobile-First Apple Design */}
             <AnimatePresence>
                 {confirmModal && (
                     <motion.div

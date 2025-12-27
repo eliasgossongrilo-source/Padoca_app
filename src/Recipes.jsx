@@ -228,7 +228,10 @@ const RecipeCategoryModal = ({ categories, onClose, onUpdate, onRenameCategory }
     const [confirmDelete, setConfirmDelete] = useState(null)
     const [colorPicker, setColorPicker] = useState(null)
 
-    // Sophisticated Muted Palette
+    // Lock scroll when modal is open - Critical for mobile UX
+    useScrollLock(true)
+
+    // Sophisticated Muted Palette - Apple-curated colors
     const colorPalette = [
         '#E63946', // Soft Red
         '#F4A261', // Terracotta
@@ -295,178 +298,232 @@ const RecipeCategoryModal = ({ categories, onClose, onUpdate, onRenameCategory }
         setConfirmDelete(null)
     }
 
-    return (
-        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4">
-            {/* Backdrop */}
+    return createPortal(
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4"
+        >
+            {/* Backdrop with blur */}
             <motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-white/5 dark:bg-white/5 backdrop-blur-lg"
+                className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {/* Modal Content */}
+            {/* Modal Content - Premium Apple Bottom Sheet */}
             <motion.div
-                initial={{ opacity: 0, y: 100 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 100 }}
-                transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                className="relative w-full md:max-w-md bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-[2rem] p-6 pb-8 md:p-8 shadow-2xl overflow-hidden max-h-[90vh] md:max-h-[85vh] flex flex-col safe-area-bottom"
+                initial={{ y: "100%", opacity: 0.5 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 28, stiffness: 320 }}
+                className="relative w-full md:max-w-md bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-[2rem] shadow-2xl overflow-hidden max-h-[90dvh] md:max-h-[85vh] flex flex-col"
             >
-                {/* Header - Inventory Style */}
-                <div className="flex items-center justify-between mb-8 shrink-0">
+                {/* Mobile Drag Handle - Premium */}
+                <div className="md:hidden w-full flex justify-center pt-3 pb-2 shrink-0">
+                    <div className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                </div>
+
+                {/* Header - Apple Premium */}
+                <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-zinc-100 dark:border-zinc-800">
                     <div>
                         <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Gerenciar Categorias</h3>
-                        <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1">Organize sua biblioteca de receitas</p>
+                        <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-0.5">Organize sua biblioteca de receitas</p>
                     </div>
+                    {/* Close Button - 44px touch target (Apple HIG minimum) */}
                     <button
                         onClick={onClose}
-                        className="p-3 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors touch-manipulation z-[60] relative shrink-0"
+                        className="w-11 h-11 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors active:scale-95"
+                        aria-label="Fechar"
                     >
                         <Icons.Close className="w-5 h-5" />
                     </button>
                 </div>
 
-                {/* Add New Category - Inventory Style */}
-                <div className="mb-8 shrink-0">
-                    <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-3">Adicionar Nova Categoria</h4>
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={newName}
-                            onChange={e => setNewName(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && handleAdd()}
-                            className="flex-1 px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 text-zinc-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-indigo-400/50"
-                            placeholder="Nome da categoria"
-                        />
-                        <button
-                            onClick={handleAdd}
-                            disabled={!newName.trim()}
-                            className="px-5 py-3 bg-indigo-500 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/20"
-                        >
-                            <Icons.Plus className="w-5 h-5" />
-                        </button>
+                {/* Scrollable Content Area */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    {/* Add New Category Section */}
+                    <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800">
+                        <h4 className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-3">Adicionar Nova</h4>
+                        <div className="flex gap-3">
+                            <input
+                                type="text"
+                                value={newName}
+                                onChange={e => setNewName(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleAdd()}
+                                className="flex-1 px-4 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 text-base font-semibold text-zinc-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all placeholder:text-zinc-400"
+                                placeholder="Nome da categoria"
+                            />
+                            {/* Add Button - 48px touch target */}
+                            <button
+                                onClick={handleAdd}
+                                disabled={!newName.trim()}
+                                className="w-14 h-14 flex items-center justify-center bg-indigo-500 text-white rounded-2xl font-bold hover:bg-indigo-600 active:scale-[0.96] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/25"
+                            >
+                                <Icons.Plus className="w-6 h-6" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Categories List */}
+                    <div className="px-6 py-4">
+                        <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Suas Categorias</h4>
+
+                        {categories.length === 0 ? (
+                            <div className="py-12 text-center">
+                                <div className="w-16 h-16 mx-auto bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4">
+                                    <Icons.Book className="w-7 h-7 text-zinc-400" />
+                                </div>
+                                <p className="text-sm font-medium text-zinc-500">Nenhuma categoria criada</p>
+                                <p className="text-xs text-zinc-400 mt-1">Adicione uma categoria acima</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                {categories.map((cat, idx) => {
+                                    const { name, color } = normalizeCategory(cat)
+                                    const catId = name + idx
+
+                                    return (
+                                        <div key={catId} className="relative">
+                                            <div className="group flex items-center gap-4 py-4 px-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-800/30 border border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-700 transition-all">
+                                                {/* Color Button - 48px touch target */}
+                                                <button
+                                                    onClick={() => setColorPicker(colorPicker === catId ? null : catId)}
+                                                    className="w-12 h-12 rounded-xl flex items-center justify-center bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 transition-all hover:scale-105 active:scale-95 shadow-sm"
+                                                    aria-label="Mudar cor"
+                                                >
+                                                    <div
+                                                        className="w-6 h-6 rounded-full shadow-inner"
+                                                        style={{ backgroundColor: color }}
+                                                    />
+                                                </button>
+
+                                                {/* Name - Editable */}
+                                                <div className="flex-1 min-w-0">
+                                                    {editingId === catId ? (
+                                                        <input
+                                                            autoFocus
+                                                            value={editValue}
+                                                            onChange={e => setEditValue(e.target.value)}
+                                                            onBlur={() => handleRename(cat)}
+                                                            onKeyDown={e => {
+                                                                if (e.key === 'Enter') handleRename(cat)
+                                                                if (e.key === 'Escape') setEditingId(null)
+                                                            }}
+                                                            className="w-full bg-transparent outline-none text-base font-semibold text-zinc-900 dark:text-white py-2"
+                                                        />
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => { setEditingId(catId); setEditValue(name) }}
+                                                            className="w-full text-left py-2 text-base font-semibold text-zinc-800 dark:text-zinc-100 truncate hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                                        >
+                                                            {name}
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                {/* Delete Button - 48px touch target */}
+                                                <button
+                                                    onClick={() => setConfirmDelete(cat)}
+                                                    className="w-12 h-12 flex items-center justify-center rounded-xl text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all active:scale-95"
+                                                    aria-label="Excluir categoria"
+                                                >
+                                                    <Icons.Trash className="w-5 h-5" />
+                                                </button>
+                                            </div>
+
+                                            {/* Color Picker - Inline Dropdown (Better mobile UX) */}
+                                            <AnimatePresence>
+                                                {colorPicker === catId && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                                        animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
+                                                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <div className="bg-white dark:bg-zinc-800 rounded-2xl p-5 border border-zinc-200 dark:border-zinc-700 shadow-lg">
+                                                            <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Escolha uma cor</div>
+                                                            <div className="grid grid-cols-5 gap-3">
+                                                                {colorPalette.map(c => (
+                                                                    <button
+                                                                        key={c}
+                                                                        onClick={() => handleColorChange(cat, c)}
+                                                                        className={`w-12 h-12 md:w-10 md:h-10 rounded-xl transition-all hover:scale-110 active:scale-95 shadow-sm ${color === c ? 'ring-2 ring-offset-2 ring-zinc-900 dark:ring-white ring-offset-white dark:ring-offset-zinc-800 scale-110' : ''}`}
+                                                                        style={{ backgroundColor: c }}
+                                                                        aria-label={`Cor ${c}`}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                            {/* Close button for color picker */}
+                                                            <button
+                                                                onClick={() => setColorPicker(null)}
+                                                                className="mt-4 w-full py-3.5 bg-zinc-100 dark:bg-zinc-700 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors active:scale-[0.98]"
+                                                            >
+                                                                Fechar
+                                                            </button>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Categories List - Inventory Style + Color Picker */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar -mx-2 px-2 space-y-3">
-                    <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 sticky top-0 bg-white dark:bg-zinc-900 py-2 z-10">Suas Categorias</h4>
-                    {categories.map((cat, idx) => {
-                        const { name, color } = normalizeCategory(cat)
-                        const catId = name + idx
+                {/* Bottom Safe Area Spacer */}
+                <div className="shrink-0 h-6 md:h-4" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
 
-                        return (
-                            <div key={catId} className="group flex items-center justify-between py-3 px-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/20 hover:border-indigo-200 dark:hover:border-indigo-700 transition-colors">
-                                <div className="flex items-center gap-3 flex-1 min-w-0">
-                                    {/* Color Dot */}
-                                    <button
-                                        onClick={() => setColorPicker(colorPicker === catId ? null : catId)}
-                                        className="w-4 h-4 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900 ring-transparent hover:ring-indigo-300 transition-all shadow-sm"
-                                        style={{ backgroundColor: color }}
-                                    />
-
-                                    {/* Color Picker Dropdown - Mobile Friendly */}
-                                    <AnimatePresence>
-                                        {colorPicker === catId && (
-                                            <motion.div
-                                                initial={{ opacity: 0, scale: 0.9 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0.9 }}
-                                                className="fixed inset-x-4 bottom-4 md:absolute md:inset-auto md:left-0 md:top-full md:mt-2 z-[70] bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-4 border border-zinc-200 dark:border-zinc-700"
-                                            >
-                                                <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 text-center md:text-left">Escolha uma cor</div>
-                                                <div className="grid grid-cols-5 gap-3">
-                                                    {colorPalette.map(c => (
-                                                        <button
-                                                            key={c}
-                                                            onClick={() => handleColorChange(cat, c)}
-                                                            className={`w-10 h-10 md:w-7 md:h-7 rounded-full transition-transform hover:scale-110 active:scale-95 ${color === c ? 'ring-2 ring-offset-2 ring-zinc-400 dark:ring-offset-zinc-800' : ''}`}
-                                                            style={{ backgroundColor: c }}
-                                                        />
-                                                    ))}
-                                                </div>
-                                                <button
-                                                    onClick={() => setColorPicker(null)}
-                                                    className="mt-4 w-full py-3 bg-zinc-100 dark:bg-zinc-700 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider md:hidden"
-                                                >
-                                                    Fechar
-                                                </button>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-
-                                    {/* Name */}
-                                    <div className="flex-1 min-w-0">
-                                        {editingId === catId ? (
-                                            <input
-                                                autoFocus
-                                                value={editValue}
-                                                onChange={e => setEditValue(e.target.value)}
-                                                onBlur={() => handleRename(cat)}
-                                                onKeyDown={e => {
-                                                    if (e.key === 'Enter') handleRename(cat)
-                                                    if (e.key === 'Escape') setEditingId(null)
-                                                }}
-                                                className="w-full bg-transparent outline-none text-sm font-bold text-zinc-900 dark:text-white"
-                                            />
-                                        ) : (
-                                            <span
-                                                onClick={() => { setEditingId(catId); setEditValue(name) }}
-                                                className="text-sm font-medium text-indigo-900 dark:text-indigo-200 cursor-text truncate block select-none"
-                                            >
-                                                {name}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Delete */}
-                                <button
-                                    onClick={() => setConfirmDelete(cat)}
-                                    className="p-3 rounded-lg text-indigo-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 touch-manipulation"
-                                >
-                                    <Icons.Trash className="w-4 h-4" />
-                                </button>
-                            </div>
-                        )
-                    })}
-                </div>
-
-                {/* Delete Confirmation Overlay - Inventory Style */}
+                {/* Delete Confirmation Overlay - Premium Design */}
                 <AnimatePresence>
                     {confirmDelete && (
                         <motion.div
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-white/90 dark:bg-zinc-900/95 backdrop-blur-md z-50 flex items-center justify-center p-6"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-white/95 dark:bg-zinc-900/98 backdrop-blur-xl z-50 flex items-center justify-center p-8"
                         >
-                            <div className="text-center w-full">
-                                <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center text-rose-500 mx-auto mb-4 shadow-sm">
-                                    <Icons.Trash className="w-8 h-8" />
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                className="text-center w-full max-w-sm"
+                            >
+                                <div className="w-20 h-20 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center text-rose-500 mx-auto mb-6 shadow-lg shadow-rose-500/10">
+                                    <Icons.Trash className="w-9 h-9" />
                                 </div>
-                                <h4 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">Excluir Categoria?</h4>
-                                <p className="text-sm text-zinc-500 mb-8 leading-relaxed">
-                                    A categoria <span className="font-bold text-zinc-800 dark:text-zinc-200">"{getCategoryName(confirmDelete)}"</span> será removida.<br />As receitas serão movidas para "Outros".
+                                <h4 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 tracking-tight">Excluir Categoria?</h4>
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed">
+                                    A categoria <span className="font-bold text-zinc-800 dark:text-zinc-200">"{getCategoryName(confirmDelete)}"</span> será removida permanentemente. As receitas serão movidas para "Outros".
                                 </p>
                                 <div className="grid grid-cols-2 gap-3">
+                                    {/* Cancel - 48px height */}
                                     <button
                                         onClick={() => setConfirmDelete(null)}
-                                        className="py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 dark:bg-zinc-800 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                        className="py-4 text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-2xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-[0.98]"
                                     >
                                         Cancelar
                                     </button>
+                                    {/* Delete - 48px height */}
                                     <button
                                         onClick={() => handleDelete(confirmDelete)}
-                                        className="py-3 text-xs font-bold uppercase tracking-wider text-white bg-rose-500 rounded-xl hover:bg-rose-600 shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+                                        className="py-4 text-xs font-bold uppercase tracking-wider text-white bg-rose-500 rounded-2xl hover:bg-rose-600 shadow-lg shadow-rose-500/25 transition-all active:scale-[0.96]"
                                     >
                                         Excluir
                                     </button>
                                 </div>
-                            </div>
+                            </motion.div>
                         </motion.div>
                     )}
                 </AnimatePresence>
             </motion.div>
-        </div>
+        </motion.div>,
+        document.body
     )
 }
 
@@ -1407,7 +1464,7 @@ export default function Recipes() {
                 {zoomedImage && <ImageLightbox src={zoomedImage} onClose={() => setZoomedImage(null)} />}
             </AnimatePresence>
 
-            {/* Premium Confirmation Modal - Safe Animated Portal */}
+            {/* Premium Confirmation Modal - Mobile-First Apple Design */}
             {typeof document !== 'undefined' && createPortal(
                 <AnimatePresence mode="wait">
                     {confirmModal && (
@@ -1416,7 +1473,7 @@ export default function Recipes() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[10000] flex items-center justify-center p-4"
+                            className="fixed inset-0 z-[10000] flex items-end md:items-center justify-center p-0 md:p-4"
                         >
                             {/* Backdrop */}
                             <div
@@ -1424,16 +1481,28 @@ export default function Recipes() {
                                 onClick={confirmModal.onCancel}
                             />
 
-                            {/* Modal Content */}
-                            {/* Modal Content */}
+                            {/* Modal Content - Bottom sheet on mobile */}
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                                className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+                                initial={{ y: "100%", opacity: 0.5 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: "100%", opacity: 0 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                className="relative w-full md:max-w-sm bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-3xl p-6 pb-8 shadow-2xl border-t md:border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+                                style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }}
                             >
                                 <ConfirmModalScrollLock />
+                                {/* Mobile Drag Handle */}
+                                <div className="md:hidden w-full flex justify-center mb-4">
+                                    <div className="w-10 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                                </div>
+                                {/* Close Button - 44px touch target */}
+                                <button
+                                    onClick={confirmModal.onCancel}
+                                    className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors active:scale-95"
+                                    aria-label="Fechar"
+                                >
+                                    <Icons.Close className="w-5 h-5" />
+                                </button>
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${confirmModal.type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'}`}>
                                     <Icons.Trash />
                                 </div>
@@ -1450,7 +1519,7 @@ export default function Recipes() {
                                     </button>
                                     <button
                                         onClick={confirmModal.onConfirm}
-                                        className={`flex-1 py-3 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all ${confirmModal.type === 'danger' ? 'bg-rose-500 shadow-rose-500/20' : 'bg-zinc-900 dark:bg-white dark:text-zinc-900'}`}
+                                        className={`flex-1 py-3 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg active:scale-95 transition-all ${confirmModal.type === 'danger' ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/20' : 'bg-zinc-900 dark:bg-white dark:text-zinc-900'}`}
                                     >
                                         Confirmar
                                     </button>

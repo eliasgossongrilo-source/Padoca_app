@@ -502,13 +502,13 @@ export default function Kanban() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -20, scale: 0.95 }}
                         className={`fixed top - 6 left - 1 / 2 - translate - x - 1 / 2 z - [20000] px - 5 py - 3 rounded - 2xl shadow - 2xl flex items - center gap - 3 backdrop - blur - xl border ${toastMessage.type === 'error' ? 'bg-rose-500/90 border-rose-400/20 text-white' :
-                                toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400/20 text-white' :
-                                    'bg-zinc-900/90 border-white/10 text-white'
+                            toastMessage.type === 'success' ? 'bg-emerald-500/90 border-emerald-400/20 text-white' :
+                                'bg-zinc-900/90 border-white/10 text-white'
                             } `}
                     >
                         <div className={`w - 2 h - 2 rounded - full ${toastMessage.type === 'error' ? 'bg-white animate-pulse' :
-                                toastMessage.type === 'success' ? 'bg-white' :
-                                    'bg-indigo-400'
+                            toastMessage.type === 'success' ? 'bg-white' :
+                                'bg-indigo-400'
                             } `} />
                         <span className="text-sm font-semibold tracking-tight">{toastMessage.message}</span>
                     </motion.div>,
@@ -741,10 +741,31 @@ const DragGhost = React.memo(({ dragState, ghostX, ghostY, spring }) => {
 function ConfirmationModal({ title, message, type = 'info', onConfirm, onCancel }) {
     useScrollLock(true)
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} transition={{ type: "spring", stiffness: 400, damping: 30 }} className="relative bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl max-w-sm w-full border border-zinc-200/50 dark:border-white/10 overflow-hidden">
-                <div className={`w - 14 h - 14 rounded - full flex items - center justify - center mb - 6 mx - auto ${type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'} `}>
+            <motion.div
+                initial={{ y: "100%", opacity: 0.5 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="relative bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-3xl p-6 pb-8 shadow-2xl max-w-sm w-full border-t md:border border-zinc-200/50 dark:border-white/10 overflow-hidden"
+                style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }}
+            >
+                {/* Mobile Drag Handle */}
+                <div className="md:hidden w-full flex justify-center mb-4">
+                    <div className="w-10 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                </div>
+                {/* Close Button - 44px touch target */}
+                <button
+                    onClick={onCancel}
+                    className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors active:scale-95"
+                    aria-label="Fechar"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                </button>
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 mx-auto ${type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'}`}>
                     {type === 'danger' ? (
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -759,7 +780,7 @@ function ConfirmationModal({ title, message, type = 'info', onConfirm, onCancel 
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-8 leading-relaxed text-center font-medium">{message}</p>
                 <div className="flex gap-3">
                     <button onClick={onCancel} className="flex-1 py-3.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">Cancelar</button>
-                    <button onClick={onConfirm} className={`flex - 1 py - 3.5 rounded - xl font - bold text - xs uppercase tracking - wider text - white shadow - lg active: scale - 95 transition - all ${type === 'danger' ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/25' : 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'} `}>Confirmar</button>
+                    <button onClick={onConfirm} className={`flex-1 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white shadow-lg active:scale-95 transition-all ${type === 'danger' ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/25' : 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'}`}>Confirmar</button>
                 </div>
             </motion.div>
         </motion.div>
@@ -813,7 +834,7 @@ function CardDetailsModal({ card, onClose, onUpdate, onDelete, setConfirmModal }
                                 <button key={label.id} onClick={() => toggleLabel(label)} className={`w - 7 h - 7 rounded - full transition - all ring - 2 ring - offset - 2 dark: ring - offset - zinc - 900 ${localCard.labels?.find(l => l.id === label.id) ? 'ring-zinc-900 dark:ring-white scale-110' : 'ring-transparent opacity-40 hover:opacity-100 hover:scale-110'} `} style={{ backgroundColor: label.color }} />
                             ))}
                         </div>
-                        <button onClick={onClose} className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-white flex items-center justify-center transition-colors">
+                        <button onClick={onClose} className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-white flex items-center justify-center transition-colors active:scale-95">
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>

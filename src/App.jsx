@@ -80,12 +80,32 @@ const spring = {
   mass: 0.8
 }
 
-// Page transition variants - Ultra-fast Apple-style (iOS tab switching)
-// No scale or y transforms - just instant opacity fade
+// Page transition variants - Apple iOS-style fluid transitions
+// Subtle scale with smooth opacity for premium feel
 const pageVariants = {
-  initial: { opacity: 0 },
-  enter: { opacity: 1 },
-  exit: { opacity: 0 }
+  initial: {
+    opacity: 0,
+    scale: 0.98,
+    y: 8
+  },
+  enter: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.35,
+      ease: [0.25, 0.1, 0.25, 1], // Apple ease-out curve
+    }
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.98,
+    y: -8,
+    transition: {
+      duration: 0.2,
+      ease: [0.25, 0.1, 0.25, 1]
+    }
+  }
 }
 
 export default function App() {
@@ -233,14 +253,13 @@ export default function App() {
         </header>
 
         {/* Content Area with Premium Transitions */}
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="wait">
           <motion.main
             key={view}
             initial="initial"
             animate="enter"
             exit="exit"
             variants={pageVariants}
-            transition={{ duration: 0.05, ease: "easeOut" }}
             className="relative z-10"
           >
             {view === 'kanban' ? (

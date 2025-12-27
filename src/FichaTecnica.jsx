@@ -836,40 +836,21 @@ export default function FichaTecnica() {
                                         </div>
                                     )}
 
-                                    {/* Manual Entry Fields (Name and Price if not matched, or for edit) */}
+                                    {/* Unit Selector (when not matched from inventory) */}
                                     {!matchedInventoryItem && (
-                                        <div className="space-y-4 mb-5">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Preço por Unidade</label>
-                                                    <div className="relative">
-                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm font-bold">R$</span>
-                                                        <input
-                                                            type="number"
-                                                            step="any"
-                                                            inputMode="decimal"
-                                                            className="w-full pl-10 pr-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-right text-lg font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all placeholder:text-zinc-300"
-                                                            placeholder="0,00"
-                                                            value={newIngredient.pricePerUnit}
-                                                            onChange={(e) => setNewIngredient(prev => ({ ...prev, pricePerUnit: e.target.value }))}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Unidade</label>
-                                                    <select
-                                                        className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-lg font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all appearance-none text-center"
-                                                        value={newIngredient.unit}
-                                                        onChange={(e) => handleUnitChange(e.target.value)}
-                                                    >
-                                                        <option value="g">g</option>
-                                                        <option value="kg">kg</option>
-                                                        <option value="ml">ml</option>
-                                                        <option value="L">L</option>
-                                                        <option value="un">un</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                                        <div className="mb-5">
+                                            <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Unidade</label>
+                                            <select
+                                                className="w-full px-4 py-4 rounded-2xl bg-zinc-50/50 dark:bg-black/20 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-white text-lg font-bold focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-1 focus:ring-indigo-500/20 transition-all appearance-none text-center"
+                                                value={newIngredient.unit}
+                                                onChange={(e) => handleUnitChange(e.target.value)}
+                                            >
+                                                <option value="g">g</option>
+                                                <option value="kg">kg</option>
+                                                <option value="ml">ml</option>
+                                                <option value="L">L</option>
+                                                <option value="un">un</option>
+                                            </select>
                                         </div>
                                     )}
 
@@ -1277,14 +1258,14 @@ export default function FichaTecnica() {
                     )}
                 </div>
             )}
-            {/* Premium Confirmation Modal - Director Standard */}
+            {/* Premium Confirmation Modal - Mobile-First Apple Design */}
             <AnimatePresence>
                 {confirmModal && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+                        className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6"
                     >
                         <ModalScrollLock />
                         <motion.div
@@ -1295,12 +1276,27 @@ export default function FichaTecnica() {
                             onClick={confirmModal.onCancel}
                         />
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                            className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+                            initial={{ y: "100%", opacity: 0.5 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: "100%", opacity: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="relative w-full md:max-w-sm bg-white dark:bg-zinc-900 rounded-t-[2rem] md:rounded-3xl p-6 pb-8 shadow-2xl border-t md:border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+                            style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 32px)' }}
                         >
+                            {/* Mobile Drag Handle */}
+                            <div className="md:hidden w-full flex justify-center mb-4">
+                                <div className="w-10 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                            </div>
+                            {/* Close Button - 44px touch target */}
+                            <button
+                                onClick={confirmModal.onCancel}
+                                className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors active:scale-95"
+                                aria-label="Fechar"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                </svg>
+                            </button>
                             <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 mx-auto ${confirmModal.type === 'danger' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-zinc-100 text-zinc-600'}`}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     {confirmModal.type === 'danger' ? (
